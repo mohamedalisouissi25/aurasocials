@@ -9,19 +9,25 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    setLoading(true); setError('')
-    setTimeout(() => {
-      if (form.email && form.password.length >= 6) {
-        localStorage.setItem('aura_user', JSON.stringify({ email: form.email, name: form.email.split('@')[0] }))
-        nav('/crm')
-      } else {
-        setError('Email ou mot de passe incorrect. (6 caractères minimum)')
-        setLoading(false)
-      }
-    }, 900)
+  const handleSubmit = async (e) => {
+  e.preventDefault()
+  setLoading(true)
+  setError('')
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: form.email, password: form.password })
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error || 'Erreur de connexion')
+    localStorage.setItem('aura_user', JSON.stringify(data.user))
+    nav('/crm')
+  } catch (err) {
+    setError(err.message)
+    setLoading(false)
   }
+}
 
   return (
     <div className="auth-page">

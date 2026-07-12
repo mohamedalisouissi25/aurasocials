@@ -14,14 +14,24 @@ export default function Register() {
     { label: 'Un chiffre', ok: /[0-9]/.test(form.password) },
   ]
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setTimeout(() => {
-      localStorage.setItem('aura_user', JSON.stringify({ email: form.email, name: form.name, company: form.company }))
-      nav('/crm')
-    }, 1000)
+  const handleSubmit = async (e) => {
+  e.preventDefault()
+  setLoading(true)
+  try {
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: form.name, email: form.email, password: form.password, company: form.company })
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error || 'Erreur lors de l\'inscription')
+    localStorage.setItem('aura_user', JSON.stringify(data.user))
+    nav('/crm')
+  } catch (err) {
+    alert(err.message)
+    setLoading(false)
   }
+}
 
   return (
     <div className="auth-page">

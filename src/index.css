@@ -544,3 +544,80 @@ body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: anti
 .analytics-bar-bg { flex: 1; height: 8px; background: #F3F4F6; border-radius: 99px; overflow: hidden; }
 .analytics-bar-fill { height: 100%; border-radius: 99px; transition: width 0.5s; }
 .analytics-bar-val { font-size: 12px; font-weight: 600; color: #374151; width: 50px; text-align: right; }
+
+/* ════ MODAL ════ */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(11,18,42,0.6);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2000; padding: 20px; backdrop-filter: blur(6px);
+}
+.modal-box {
+  background: white; border-radius: 24px; padding: 40px;
+  width: 100%; max-width: 540px;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.3);
+  animation: modalIn 0.2s ease;
+}
+@keyframes modalIn {
+  from { opacity:0; transform:scale(0.94) translateY(12px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
+.modal-title { font-size:22px; font-weight:800; color:#111827; margin-bottom:4px; }
+.modal-sub   { font-size:14px; color:#6B7280; margin-bottom:28px; }
+.modal-grid  { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.modal-field { margin-bottom:16px; }
+.modal-label { display:block; font-size:13px; font-weight:600; color:#374151; margin-bottom:7px; }
+.modal-input, .modal-select {
+  width:100%; border:1.5px solid #E5E7EB; border-radius:11px;
+  padding:12px 14px; font-size:14px; font-family:inherit; outline:none; color:#111827;
+  transition: border-color 0.2s;
+}
+.modal-input:focus, .modal-select:focus { border-color:#4A6CF7; box-shadow:0 0 0 3px rgba(74,108,247,0.1); }
+.modal-nets  { display:flex; flex-wrap:wrap; gap:8px; }
+.modal-net   { padding:7px 14px; border:1.5px solid #E5E7EB; border-radius:8px; font-size:13px; font-weight:600; color:#374151; cursor:pointer; transition:all 0.15s; background:white; font-family:inherit; }
+.modal-net.on { border-color:#4A6CF7; background:#EEF1FB; color:#4A6CF7; }
+.modal-btns  { display:flex; gap:12px; justify-content:flex-end; margin-top:28px; }
+.modal-cancel { padding:11px 22px; border:1.5px solid #E5E7EB; border-radius:10px; background:white; color:#6B7280; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; }
+.modal-submit { padding:11px 28px; background:#4A6CF7; color:white; border:none; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; box-shadow:0 4px 14px rgba(74,108,247,0.4); }
+.modal-submit:hover { opacity:0.9; }
+
+/* ════ TOAST ════ */
+.toast {
+  position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+  background:#111827; color:white; padding:13px 28px; border-radius:14px;
+  font-size:14px; font-weight:500; z-index:9999;
+  box-shadow:0 8px 30px rgba(0,0,0,0.25); white-space:nowrap;
+  animation:toastIn 0.3s ease;
+}
+@keyframes toastIn {
+  from { opacity:0; transform:translateX(-50%) translateY(16px); }
+  to   { opacity:1; transform:translateX(-50%) translateY(0); }
+}
+
+/* ════ BLOG ════ */
+.aura-blog { padding:100px 48px; background:#F8FAFF; }
+.aura-blog-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+.aura-blog-card {
+  background:white; border-radius:20px; overflow:hidden;
+  border:1.5px solid #E8ECF8; cursor:pointer; transition:all 0.25s;
+}
+.aura-blog-card:hover { transform:translateY(-6px); box-shadow:0 24px 60px rgba(27,42,90,0.1); border-color:#4A6CF7; }
+.aura-blog-thumb { height:160px; display:flex; align-items:center; justify-content:center; font-size:56px; }
+.aura-blog-body  { padding:24px; }
+.aura-blog-tag   { font-size:11px; font-weight:700; color:#4A6CF7; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; }
+.aura-blog-title { font-size:16px; font-weight:700; color:#1B2A5A; line-height:1.45; margin-bottom:10px; }
+.aura-blog-desc  { font-size:13px; color:#6B7280; line-height:1.65; margin-bottom:16px; }
+.aura-blog-meta  { font-size:12px; color:#9CA3AF; }
+
+/* ════ HERO GRADIENT (amélioré) ════ */
+.aura-hero-gradient {
+  background: linear-gradient(135deg,#0C1635 0%,#1B2A5A 40%,#2A3F7A 70%,#1B2A5A 100%);
+}
+
+/* ════ SECTION HIGHLIGHT ════ */
+.section-label {
+  display:inline-flex; align-items:center; gap:8px;
+  background:#EEF1FB; border:1px solid #C7D4FB;
+  color:#4A6CF7; font-size:12px; font-weight:700; letter-spacing:1px;
+  padding:6px 16px; border-radius:99px; text-transform:uppercase;
+  margin-bottom:16px;
+}
