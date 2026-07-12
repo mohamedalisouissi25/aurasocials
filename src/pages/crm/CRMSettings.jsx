@@ -18,14 +18,32 @@ const TABS = [
 
 function Toggle({ on, onToggle }) {
   return (
-    <div onClick={onToggle} style={{cursor:'pointer'}}>
-      <div className={`toggle-track ${on?'on':''}`}>
-        <div className="toggle-thumb"/>
+    <div
+      onClick={onToggle}
+      style={{
+        position:'relative', width:44, height:24,
+        flexShrink:0, cursor:'pointer'
+      }}>
+      <div style={{
+        position:'absolute', inset:0,
+        background: on ? '#4A6CF7' : '#E5E7EB',
+        borderRadius:12,
+        transition:'background 0.2s',
+      }}>
+        <div style={{
+          position:'absolute',
+          top:3,
+          left: on ? 23 : 3,
+          width:18, height:18,
+          background:'white',
+          borderRadius:'50%',
+          transition:'left 0.2s',
+          boxShadow:'0 1px 4px rgba(0,0,0,0.2)',
+        }}/>
       </div>
     </div>
   )
 }
-
 function Toast({ msg }) {
   return msg ? <div className="toast">✓ &nbsp;{msg}</div> : null
 }

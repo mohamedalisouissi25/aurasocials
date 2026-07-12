@@ -1,14 +1,15 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom'
 import {
   LayoutDashboard, Users, Calendar, Brain, BarChart3,
-  Bell, Settings, LogOut, ChevronLeft, ChevronRight, Sparkles
+  Settings, LogOut, ChevronLeft, ChevronRight, Sparkles,
+  Bell, X, CheckCheck, Info, AlertTriangle, TrendingUp
 } from 'lucide-react'
-import CRMDashboard    from './CRMDashboard'
-import CRMClients      from './CRMClients'
-import CRMAIGenerator  from './CRMAIGenerator'
-import CRMSettings     from './CRMSettings'
-import CRMInsights     from './CRMInsights'
+import CRMDashboard   from './CRMDashboard'
+import CRMClients     from './CRMClients'
+import CRMAIGenerator from './CRMAIGenerator'
+import CRMSettings    from './CRMSettings'
+import CRMInsights    from './CRMInsights'
 
 const NAV = [
   { path:'/crm',           label:'Dashboard',    icon:LayoutDashboard },
@@ -20,6 +21,117 @@ const NAV = [
 ]
 
 const NET_C = { IG:'#E97729', LI:'#0A66C2', FB:'#1877F2', TK:'#111' }
+
+const NOTIFICATIONS = [
+  { id:1, type:'alert',   icon:AlertTriangle, color:'#EF4444', bg:'#FEE2E2', title:'Commentaires négatifs en hausse', desc:'Nike France Instagram — +34% de sentiment négatif détecté', time:'Il y a 12 min', read:false },
+  { id:2, type:'success', icon:TrendingUp,    color:'#059669', bg:'#D1FAE5', title:'Performance en hausse', desc:'Café Lumière Instagram — Engagement +28% cette semaine', time:'Il y a 1h',    read:false },
+  { id:3, type:'info',    icon:Brain,         color:'#4A6CF7', bg:'#EEF1FB', title:'Rapport IA prêt', desc:'Plan éditorial juillet 2026 généré pour Voyage & Liberté', time:'Il y a 2h',    read:false },
+  { id:4, type:'info',    icon:Info,          color:'#4A6CF7', bg:'#EEF1FB', title:'Nouveau client ajouté', desc:'TechStart SAS a été ajouté à votre portfolio', time:'Hier 18:34',  read:true  },
+  { id:5, type:'success', icon:CheckCheck,    color:'#059669', bg:'#D1FAE5', title:'Publication publiée', desc:'Post Instagram Nike France publié avec succès à 18h00', time:'Hier 18:02',  read:true  },
+]
+
+function NotificationPanel({ onClose }) {
+  const [notifs, setNotifs] = useState(NOTIFICATIONS)
+  const unread = notifs.filter(n => !n.read).length
+
+  const markAll = () => setNotifs(n => n.map(x => ({ ...x, read:true })))
+  const markOne = (id) => setNotifs(n => n.map(x => x.id===id ? {...x,read:true} : x))
+  const removeOne = (id) => setNotifs(n => n.filter(x => x.id!==id))
+
+  return (
+    <div style={{
+      position:'absolute', top:'calc(100% + 12px)', right:0,
+      width:380, background:'white', borderRadius:20,
+      boxShadow:'0 20px 60px rgba(0,0,0,0.15)',
+      border:'1px solid #F1F3F9', zIndex:200,
+      animation:'modalIn 0.2s ease',
+      overflow:'hidden',
+    }}>
+      {/* Header */}
+      <div style={{padding:'16px 20px',borderBottom:'1px solid #F3F4F6',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+        <div>
+          <div style={{fontSize:15,fontWeight:800,color:'#111827'}}>Notifications</div>
+          {unread > 0
+            ? <div style={{fontSize:12,color:'#9CA3AF',marginTop:2}}>{unread} non lue{unread>1?'s':''}</div>
+            : <div style={{fontSize:12,color:'#059669',marginTop:2}}>Tout est lu ✓</div>
+          }
+        </div>
+        <div style={{display:'flex',gap:8,alignItems:'center'}}>
+          {unread > 0 && (
+            <button onClick={markAll}
+              style={{fontSize:11,fontWeight:700,color:'#4A6CF7',background:'#EEF1FB',border:'none',padding:'4px 10px',borderRadius:8,cursor:'pointer',fontFamily:'inherit'}}>
+              Tout lire
+            </button>
+          )}
+          <button onClick={onClose}
+            style={{background:'none',border:'none',cursor:'pointer',color:'#9CA3AF',padding:4,display:'flex',alignItems:'center'}}>
+            <X size={16}/>
+          </button>
+        </div>
+      </div>
+
+      {/* List */}
+      <div style={{maxHeight:400,overflowY:'auto'}}>
+        {notifs.length === 0 ? (
+          <div style={{padding:'48px 20px',textAlign:'center'}}>
+            <div style={{fontSize:44,marginBottom:12}}>🔔</div>
+            <div style={{fontSize:15,fontWeight:700,color:'#111827',marginBottom:6}}>Aucune notification</div>
+            <div style={{fontSize:13,color:'#9CA3AF'}}>Vous êtes à jour ! Les alertes importantes apparaîtront ici.</div>
+          </div>
+        ) : notifs.map(n => {
+          const Icon = n.icon
+          return (
+            <div key={n.id}
+              onClick={() => markOne(n.id)}
+              style={{
+                display:'flex',alignItems:'flex-start',gap:12,
+                padding:'14px 20px',cursor:'pointer',
+                background: n.read ? 'white' : '#FAFBFF',
+                borderBottom:'1px solid #F9FAFB',
+                transition:'background 0.15s',
+                position:'relative',
+              }}
+              onMouseEnter={e => e.currentTarget.style.background='#F8FAFF'}
+              onMouseLeave={e => e.currentTarget.style.background=n.read?'white':'#FAFBFF'}>
+              {/* Unread dot */}
+              {!n.read && (
+                <div style={{position:'absolute',top:18,right:16,width:7,height:7,borderRadius:'50%',background:'#4A6CF7'}}/>
+              )}
+              {/* Icon */}
+              <div style={{width:36,height:36,borderRadius:10,background:n.bg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginTop:1}}>
+                <Icon size={16} style={{color:n.color}}/>
+              </div>
+              {/* Content */}
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:13,fontWeight: n.read ? 500 : 700,color:'#111827',marginBottom:2,lineHeight:1.4}}>
+                  {n.title}
+                </div>
+                <div style={{fontSize:12,color:'#6B7280',lineHeight:1.5,marginBottom:4}}>{n.desc}</div>
+                <div style={{fontSize:11,color:'#9CA3AF'}}>{n.time}</div>
+              </div>
+              {/* Remove */}
+              <button
+                onClick={e => { e.stopPropagation(); removeOne(n.id) }}
+                style={{background:'none',border:'none',cursor:'pointer',color:'#D1D5DB',padding:'2px',display:'flex',alignItems:'center',flexShrink:0,marginTop:1}}
+                title="Supprimer">
+                <X size={13}/>
+              </button>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Footer */}
+      <div style={{padding:'12px 20px',borderTop:'1px solid #F3F4F6',textAlign:'center'}}>
+        <button
+          style={{fontSize:13,fontWeight:600,color:'#4A6CF7',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}
+          onClick={onClose}>
+          Gérer les notifications →
+        </button>
+      </div>
+    </div>
+  )
+}
 
 function CalendarPage() {
   const posts = {1:['IG','LI'],3:['FB'],5:['IG'],8:['LI','IG'],10:['TK'],12:['IG'],14:['FB','LI'],15:['IG'],17:['IG'],19:['LI'],21:['IG','FB'],22:['TK'],25:['IG'],27:['LI'],29:['FB','TK']}
@@ -34,17 +146,13 @@ function CalendarPage() {
       </div>
       <div className="crm-card">
         <div className="cal-header">
-          {['LUN','MAR','MER','JEU','VEN','SAM','DIM'].map(d => (
-            <div key={d} className="cal-day-name">{d}</div>
-          ))}
+          {['LUN','MAR','MER','JEU','VEN','SAM','DIM'].map(d => <div key={d} className="cal-day-name">{d}</div>)}
         </div>
         <div className="cal-grid">
           {Array.from({length:30},(_,i)=>i+1).map(d => (
             <div key={d} className="cal-cell">
               <div className="cal-cell-num">{d}</div>
-              {(posts[d]||[]).map(n => (
-                <div key={n} className="cal-net-pill" style={{background:NET_C[n]}}>{n}</div>
-              ))}
+              {(posts[d]||[]).map(n => <div key={n} className="cal-net-pill" style={{background:NET_C[n]}}>{n}</div>)}
             </div>
           ))}
         </div>
@@ -112,13 +220,25 @@ function AnalyticsPage() {
 export default function CRMLayout() {
   const nav = useNavigate()
   const loc = useLocation()
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed,    setCollapsed]    = useState(false)
+  const [showNotifs,   setShowNotifs]   = useState(false)
+  const bellRef = useRef(null)
   const user = JSON.parse(localStorage.getItem('aura_user') || '{}')
 
-  const logout = () => {
-    localStorage.removeItem('aura_user')
-    nav('/login')
-  }
+  const unreadCount = NOTIFICATIONS.filter(n => !n.read).length
+
+  // Ferme le panel si clic en dehors
+  useEffect(() => {
+    const handler = (e) => {
+      if (bellRef.current && !bellRef.current.contains(e.target)) {
+        setShowNotifs(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const logout = () => { localStorage.removeItem('aura_user'); nav('/login') }
 
   const allPaths = [
     ...NAV,
@@ -127,7 +247,6 @@ export default function CRMLayout() {
   const currentPage = allPaths.find(n =>
     n.path === loc.pathname || (n.path !== '/crm' && loc.pathname.startsWith(n.path))
   )
-
   const isActive = (path) =>
     loc.pathname === path || (path !== '/crm' && loc.pathname.startsWith(path))
 
@@ -143,8 +262,6 @@ export default function CRMLayout() {
         <button className="crm-collapse-btn" onClick={() => setCollapsed(!collapsed)}>
           {collapsed ? <ChevronRight size={13}/> : <ChevronLeft size={13}/>}
         </button>
-
-        {/* Main nav */}
         <nav className="crm-nav">
           {NAV.map(({ path, label, icon:Icon }) => (
             <button key={path} onClick={() => nav(path)}
@@ -157,8 +274,6 @@ export default function CRMLayout() {
             </button>
           ))}
         </nav>
-
-        {/* Bottom nav */}
         <div className="crm-nav-bottom">
           <button onClick={() => nav('/crm/settings')}
             className={`crm-nav-item ${isActive('/crm/settings') ? 'active' : ''}`}
@@ -166,9 +281,7 @@ export default function CRMLayout() {
             <Settings size={17} style={{flexShrink:0}}/>
             {!collapsed && <span>Paramètres</span>}
           </button>
-          <button onClick={logout}
-            className="crm-nav-item crm-nav-item-danger"
-            style={{width:'100%'}}>
+          <button onClick={logout} className="crm-nav-item crm-nav-item-danger" style={{width:'100%'}}>
             <LogOut size={17} style={{flexShrink:0}}/>
             {!collapsed && <span>Déconnexion</span>}
           </button>
@@ -180,12 +293,44 @@ export default function CRMLayout() {
         <header className="crm-topbar">
           <span className="crm-topbar-title">{currentPage?.label || 'Dashboard'}</span>
           <div className="crm-topbar-right">
-            <button className="crm-bell-btn" onClick={() => nav('/crm/settings?tab=notifications')}>
-              <Bell size={18}/>
-              <span className="crm-notif-dot"/>
-            </button>
-            <div style={{display:'flex',alignItems:'center',gap:10,cursor:'pointer'}}
-              onClick={() => nav('/crm/settings')}>
+
+            {/* Bell with dropdown */}
+            <div ref={bellRef} style={{position:'relative'}}>
+              <button
+                onClick={() => setShowNotifs(!showNotifs)}
+                style={{
+                  position:'relative', background:'none', border:'none',
+                  cursor:'pointer', color: showNotifs ? '#4A6CF7' : '#9CA3AF',
+                  padding:8, borderRadius:10,
+                  background: showNotifs ? '#EEF1FB' : 'none',
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                  transition:'all 0.15s',
+                }}>
+                <Bell size={18}/>
+                {unreadCount > 0 && (
+                  <span style={{
+                    position:'absolute', top:4, right:4,
+                    width:16, height:16, background:'#EF4444',
+                    borderRadius:'50%', color:'white',
+                    fontSize:9, fontWeight:800,
+                    display:'flex', alignItems:'center', justifyContent:'center',
+                    border:'2px solid white',
+                  }}>
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+              {showNotifs && (
+                <NotificationPanel onClose={() => setShowNotifs(false)}/>
+              )}
+            </div>
+
+            {/* User */}
+            <div
+              style={{display:'flex',alignItems:'center',gap:10,cursor:'pointer',padding:'6px 10px',borderRadius:10,transition:'background 0.15s'}}
+              onClick={() => nav('/crm/settings')}
+              onMouseEnter={e => e.currentTarget.style.background='#F8FAFF'}
+              onMouseLeave={e => e.currentTarget.style.background='transparent'}>
               <div className="crm-avatar">{(user.name||'U')[0].toUpperCase()}</div>
               <div>
                 <div className="crm-user-name">{user.name || 'Mohamed Ali'}</div>
@@ -197,17 +342,24 @@ export default function CRMLayout() {
 
         <main className="crm-content">
           <Routes>
-            <Route index                element={<CRMDashboard/>}/>
-            <Route path="clients"       element={<CRMClients/>}/>
-            <Route path="ai"            element={<CRMAIGenerator/>}/>
-            <Route path="calendar"      element={<CalendarPage/>}/>
-            <Route path="analytics"     element={<AnalyticsPage/>}/>
-            <Route path="insights"      element={<CRMInsights/>}/>
-            <Route path="settings"      element={<CRMSettings/>}/>
-            <Route path="*"             element={<Navigate to="/crm"/>}/>
+            <Route index          element={<CRMDashboard/>}/>
+            <Route path="clients"  element={<CRMClients/>}/>
+            <Route path="ai"       element={<CRMAIGenerator/>}/>
+            <Route path="calendar" element={<CalendarPage/>}/>
+            <Route path="analytics"element={<AnalyticsPage/>}/>
+            <Route path="insights" element={<CRMInsights/>}/>
+            <Route path="settings" element={<CRMSettings/>}/>
+            <Route path="*"        element={<Navigate to="/crm"/>}/>
           </Routes>
         </main>
       </div>
+
+      <style>{`
+        @keyframes modalIn {
+          from { opacity:0; transform:scale(0.95) translateY(-8px); }
+          to   { opacity:1; transform:scale(1) translateY(0); }
+        }
+      `}</style>
     </div>
   )
 }
