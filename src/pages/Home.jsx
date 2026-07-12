@@ -17,9 +17,25 @@ const BOT_REPLIES = [
 ]
 
 const BLOG_POSTS = [
-  { emoji:'🤖', tag:'Intelligence Artificielle', title:"Comment l'IA transforme le social media en 2026", desc:"Les agences qui utilisent l'IA génèrent 3x plus de contenu et réduisent leur temps de production de 70%.", author:'Mohamed Ali Souissi', date:'10 juin 2026', read:'5 min', bg:'linear-gradient(135deg,#EEF1FB,#C7D4FB)' },
-  { emoji:'📊', tag:'Analytics & KPIs', title:"Les 5 métriques clés à suivre pour vos clients en 2026", desc:"Reach, engagement, taux de conversion, sentiment score et ROI social — les 5 KPIs essentiels.", author:'Mohamed Ali Souissi', date:'5 juin 2026', read:'7 min', bg:'linear-gradient(135deg,#FEF3C7,#FDE68A)' },
-  { emoji:'🌍', tag:'Stratégie digitale', title:"Guide complet : Instagram, LinkedIn, TikTok en 2026", desc:"Chaque réseau a ses propres codes. Ce guide vous donne les meilleures pratiques par plateforme.", author:'Mohamed Ali Souissi', date:'1 juin 2026', read:'9 min', bg:'linear-gradient(135deg,#D1FAE5,#A7F3D0)' },
+  { slug:'ia-social-media-2026',  emoji:'🤖', tag:'Intelligence Artificielle', title:"Comment l'IA transforme le social media en 2026",         desc:"Les agences qui utilisent l'IA génèrent 3x plus de contenu et réduisent leur temps de production de 70%.", author:'Mohamed Ali Souissi', date:'10 juin 2026', read:'5 min', bg:'linear-gradient(135deg,#EEF1FB,#C7D4FB)' },
+  { slug:'metriques-cles-2026',   emoji:'📊', tag:'Analytics & KPIs',          title:"Les 5 métriques clés à suivre pour vos clients en 2026",   desc:"Reach, engagement, taux de conversion, sentiment score et ROI social — les 5 KPIs essentiels.",           author:'Mohamed Ali Souissi', date:'5 juin 2026',  read:'7 min', bg:'linear-gradient(135deg,#FEF3C7,#FDE68A)' },
+  { slug:'guide-reseaux-2026',    emoji:'🌍', tag:'Stratégie digitale',        title:"Guide complet : Instagram, LinkedIn, TikTok en 2026",       desc:"Chaque réseau a ses propres codes. Ce guide vous donne les meilleures pratiques par plateforme.",          author:'Mohamed Ali Souissi', date:'1 juin 2026',  read:'9 min', bg:'linear-gradient(135deg,#D1FAE5,#A7F3D0)' },
+]
+
+const PLANS = [
+  {
+    name:'STARTER', price:'49€', per:'/mois', featured:false,
+    features:['5 clients','3 réseaux sociaux','50 posts / mois','Analytics basiques','Chatbot IA','Support email'],
+  },
+  {
+    name:'AGENCY', price:'149€', per:'/mois', featured:true,
+    features:['25 clients','Tous les réseaux','Posts illimités','IA générative complète','Analytics avancés','Calendrier éditorial','Support prioritaire'],
+  },
+  {
+    name:'ENTERPRISE', price:'499€', per:'/mois', featured:false,
+    badge:'COMPLET',
+    features:['Clients illimités','IA personnalisée','API privée dédiée','Support 24/7 dédié','Onboarding sur mesure','SLA garanti'],
+  },
 ]
 
 const SVC_ICONS = [Brain, Calendar, BarChart3, MessageSquare, Globe, Shield]
@@ -235,17 +251,25 @@ export default function Home() {
           <h2 className="aura-section-title">{t('pTitle')}</h2>
           <p className="aura-section-sub">{t('pSub')}</p>
           <div className="aura-pricing-grid">
-            {[
-              { name:'STARTER',    price:'49€',      per:'/mois', featured:false, features:['5 clients','3 réseaux sociaux','50 posts / mois','Analytics basiques','Chatbot IA','Support email'] },
-              { name:'AGENCY',     price:'149€',     per:'/mois', featured:true,  features:['25 clients','Tous les réseaux','Posts illimités','IA générative complète','Analytics avancés','Calendrier éditorial','Support prioritaire'] },
-              { name:'ENTERPRISE', price:'Sur devis',per:'',      featured:false, features:['Clients illimités','IA personnalisée','API privée dédiée','Support 24/7 dédié','Onboarding sur mesure','SLA garanti'] },
-            ].map(({ name, price, per, features, featured }) => (
+            {PLANS.map(({ name, price, per, features, featured, badge }) => (
               <div key={name} className={`aura-price-card ${featured?'featured':''}`}>
                 {featured && <div className="aura-popular-badge">★ POPULAIRE</div>}
+                {badge && !featured && (
+                  <div style={{position:'absolute',top:-12,left:'50%',transform:'translateX(-50%)',background:'linear-gradient(135deg,#1B2A5A,#2E3F7A)',color:'white',fontSize:11,fontWeight:700,padding:'4px 14px',borderRadius:99,whiteSpace:'nowrap'}}>
+                    🏆 {badge}
+                  </div>
+                )}
                 <div className="aura-plan-name">{name}</div>
-                <div className="aura-plan-price">{price}<span className="aura-plan-per">{per}</span></div>
+                <div className="aura-plan-price">
+                  {price}
+                  <span className="aura-plan-per">{per}</span>
+                </div>
                 <div className="aura-plan-divider"/>
-                {features.map(f => <div key={f} className="aura-plan-feature"><span className="aura-check">✓</span> {f}</div>)}
+                {features.map(f => (
+                  <div key={f} className="aura-plan-feature">
+                    <span className="aura-check">✓</span> {f}
+                  </div>
+                ))}
                 <button onClick={() => nav('/payment')} className={`aura-plan-btn ${featured?'primary':''}`}>
                   {t('pBtn')}
                 </button>
@@ -265,7 +289,8 @@ export default function Home() {
           <p className="aura-section-sub">{t('blogSub')}</p>
           <div className="aura-blog-grid">
             {BLOG_POSTS.map(post => (
-              <div key={post.title} className="aura-blog-card" onClick={() => nav('/payment')}>
+              <div key={post.slug} className="aura-blog-card"
+                onClick={() => nav(`/blog/${post.slug}`)}>
                 <div className="aura-blog-thumb" style={{background:post.bg}}>{post.emoji}</div>
                 <div className="aura-blog-body">
                   <div className="aura-blog-tag">{post.tag}</div>
@@ -280,7 +305,9 @@ export default function Home() {
             ))}
           </div>
           <div style={{textAlign:'center',marginTop:40}}>
-            <button onClick={() => nav('/payment')} className="aura-btn-outline" style={{borderColor:'#CBD5E1',color:'#374151',padding:'13px 32px'}}>
+            <button onClick={() => nav('/blog')}
+              className="aura-btn-outline"
+              style={{borderColor:'#CBD5E1',color:'#374151',padding:'13px 32px'}}>
               {t('blogMore')} <ArrowRight size={16} style={{display:'inline',marginLeft:6}}/>
             </button>
           </div>
@@ -295,9 +322,9 @@ export default function Home() {
             <h2 className="aura-pitch-title" style={{marginTop:16}}>{t('pitchTitle')}</h2>
             <p className="aura-pitch-desc">{t('pitchDesc')}</p>
             {[
-              { icon:'🤖', title:'IA qui génère, vous validez',   desc:"Claude génère des posts optimisés pour chaque réseau. Vous les approuvez en un clic." },
-              { icon:'📊', title:'Un dashboard, tous vos clients', desc:'Gérez Instagram, LinkedIn, TikTok, Facebook et X de tous vos clients depuis une seule interface.' },
-              { icon:'🌍', title:'Vendu dans 40+ pays',            desc:'Interface disponible en 50+ langues. AuraSocials est pensé pour scaler de Tunis à Paris, de Madrid à Tokyo.' },
+              { icon:'🤖', title:'IA qui génère, vous validez',    desc:"Claude génère des posts optimisés pour chaque réseau. Vous les approuvez en un clic." },
+              { icon:'📊', title:'Un dashboard, tous vos clients',  desc:'Gérez Instagram, LinkedIn, TikTok, Facebook et X de tous vos clients depuis une seule interface.' },
+              { icon:'🌍', title:'Vendu dans 40+ pays',             desc:'Interface disponible en 50+ langues. AuraSocials est pensé pour scaler de Tunis à Paris, de Madrid à Tokyo.' },
             ].map(f => (
               <div key={f.title} className="aura-pitch-feat">
                 <div className="aura-pitch-feat-icon">{f.icon}</div>
@@ -369,9 +396,9 @@ export default function Home() {
           <p className="aura-section-sub">{t('testiSub')}</p>
           <div className="aura-testi-grid">
             {[
-              { text:'"AuraSocials a changé notre façon de travailler. On gère 3x plus de clients avec la même équipe. L\'IA génère des posts de qualité professionnelle en secondes."', name:'Sonia Ben Ali',   role:'CEO — Agence Digit, Tunis',          color:'#4A6CF7', initial:'S' },
-              { text:'"Le seul CRM qui comprend vraiment les besoins d\'une agence social media. L\'interface multilingue nous permet de gérer des clients en France, Espagne et Italie depuis Tunis."', name:'Mehdi Rahoui',  role:'Directeur — MediaPro Agency, Sfax',  color:'#059669', initial:'M' },
-              { text:'"Le générateur IA est bluffant. En 30 secondes, on a un post Instagram parfait pour chaque client, adapté à son secteur."', name:'Laura Martinez', role:'Social Media Manager, Madrid',       color:'#F59E0B', initial:'L' },
+              { text:'"AuraSocials a changé notre façon de travailler. On gère 3x plus de clients avec la même équipe. L\'IA génère des posts de qualité professionnelle en secondes."', name:'Sonia Ben Ali',   role:'CEO — Agence Digit, Tunis',         color:'#4A6CF7', initial:'S' },
+              { text:'"Le seul CRM qui comprend vraiment les besoins d\'une agence social media. L\'interface multilingue nous permet de gérer des clients en France, Espagne et Italie depuis Tunis."', name:'Mehdi Rahoui',  role:'Directeur — MediaPro Agency, Sfax', color:'#059669', initial:'M' },
+              { text:'"Le générateur IA est bluffant. En 30 secondes, on a un post Instagram parfait pour chaque client, adapté à son secteur."', name:'Laura Martinez', role:'Social Media Manager, Madrid',      color:'#F59E0B', initial:'L' },
             ].map(tx => (
               <div key={tx.name} className="aura-testi-card">
                 <div className="aura-testi-stars">★★★★★</div>
@@ -401,7 +428,11 @@ export default function Home() {
             <span className="aura-footer-logo">AURA<span style={{fontSize:9,letterSpacing:6,opacity:0.4,display:'block',marginTop:1}}>SOCIALS</span></span>
             <p className="aura-footer-desc">{t('footerDesc')}</p>
           </div>
-          {[['Produit',['Site web','AuraCRM','Tarifs','Nouveautés']],['Support',['Documentation','Contact','FAQ','Status']],['Légal',['CGU','Confidentialité','Cookies','Mentions légales']]].map(([title,links]) => (
+          {[
+            ['Produit', ['Site web','AuraCRM','Tarifs','Nouveautés']],
+            ['Support', ['Documentation','Contact','FAQ','Status']],
+            ['Légal',   ['CGU','Confidentialité','Cookies','Mentions légales']],
+          ].map(([title,links]) => (
             <div key={title}>
               <div className="aura-footer-heading">{title}</div>
               {links.map(l => <button key={l} className="aura-footer-link" onClick={() => scrollTo('hero')}>{l}</button>)}
@@ -446,6 +477,7 @@ export default function Home() {
           <MessageSquare size={24}/>
         </button>
       </div>
+
     </div>
   )
 }
