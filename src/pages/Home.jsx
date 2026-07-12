@@ -2,18 +2,18 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Brain, Calendar, BarChart3, MessageSquare, Globe, Shield,
-  ChevronRight, Send, X, Zap, TrendingUp, ArrowRight, Clock, User
+  ChevronRight, Send, X, Zap, ArrowRight, Clock, User
 } from 'lucide-react'
 
 const LANGS = ['🇫🇷 Français','🇬🇧 English','🇸🇦 العربية','🇪🇸 Español','🇩🇪 Deutsch','🇨🇳 中文','🇯🇵 日本語','🇧🇷 Português']
 
 const SERVICES = [
-  { icon: Brain,         title:'IA Générative',        desc:'Publications créées automatiquement, adaptées à votre secteur. Claude génère des posts optimisés pour chaque réseau en un clic.' },
-  { icon: Calendar,      title:'Calendrier éditorial',  desc:'Planifiez et programmez vos posts sur tous les réseaux depuis un seul dashboard. Drag & drop natif, vue mensuelle.' },
-  { icon: BarChart3,     title:'Analytics avancés',    desc:'Suivez vos KPIs en temps réel : reach, engagement, impressions, croissance. Tableaux de bord par client et par réseau.' },
-  { icon: MessageSquare, title:'Chatbot IA 24/7',       desc:'Assistant intelligent disponible en permanence. Réponses instantanées et contextuelles pour tous vos clients.' },
-  { icon: Globe,         title:'50+ Langues',           desc:'Interface disponible dans toutes les langues du monde, RTL inclus. Vendez votre solution à des startups mondiales.' },
-  { icon: Shield,        title:'Sécurité maximale',    desc:'JWT + bcrypt + OAuth2 + HTTPS + rate limiting. Toutes les données sont chiffrées et protégées à chaque niveau.' },
+  { icon: Brain,         title:'IA Générative',       desc:'Publications créées automatiquement, adaptées à votre secteur. Claude génère des posts optimisés pour chaque réseau en un clic.' },
+  { icon: Calendar,      title:'Calendrier éditorial', desc:'Planifiez et programmez vos posts sur tous les réseaux depuis un seul dashboard. Drag & drop natif, vue mensuelle.' },
+  { icon: BarChart3,     title:'Analytics avancés',   desc:'Suivez vos KPIs en temps réel : reach, engagement, impressions, croissance. Tableaux de bord par client et par réseau.' },
+  { icon: MessageSquare, title:'Chatbot IA 24/7',      desc:'Assistant intelligent disponible en permanence. Réponses instantanées et contextuelles pour tous vos clients.' },
+  { icon: Globe,         title:'50+ Langues',          desc:'Interface disponible dans toutes les langues du monde, RTL inclus. Vendez votre solution à des startups mondiales.' },
+  { icon: Shield,        title:'Sécurité maximale',   desc:'JWT + bcrypt + OAuth2 + HTTPS + rate limiting. Toutes les données sont chiffrées et protégées à chaque niveau.' },
 ]
 
 const BOT_REPLIES = [
@@ -25,38 +25,20 @@ const BOT_REPLIES = [
 ]
 
 const BLOG_POSTS = [
-  {
-    emoji: '🤖', tag: 'Intelligence Artificielle',
-    title: "Comment l'IA transforme le social media en 2026",
-    desc: "Les agences qui utilisent l'IA génèrent 3x plus de contenu et réduisent leur temps de production de 70%. On vous explique comment.",
-    author: 'Mohamed Ali Souissi', date: '10 juin 2026', read: '5 min',
-    bg: 'linear-gradient(135deg,#EEF1FB,#C7D4FB)',
-  },
-  {
-    emoji: '📊', tag: 'Analytics & KPIs',
-    title: "Les 5 métriques clés à suivre pour vos clients en 2026",
-    desc: "Reach, engagement, taux de conversion, sentiment score et ROI social — les 5 KPIs que tout community manager doit maîtriser.",
-    author: 'Mohamed Ali Souissi', date: '5 juin 2026', read: '7 min',
-    bg: 'linear-gradient(135deg,#FEF3C7,#FDE68A)',
-  },
-  {
-    emoji: '🌍', tag: 'Stratégie digitale',
-    title: "Guide complet : Instagram, LinkedIn, TikTok en 2026",
-    desc: "Chaque réseau a ses propres codes. Ce guide vous donne les meilleures pratiques par plateforme pour maximiser l'engagement.",
-    author: 'Mohamed Ali Souissi', date: '1 juin 2026', read: '9 min',
-    bg: 'linear-gradient(135deg,#D1FAE5,#A7F3D0)',
-  },
+  { emoji:'🤖', tag:'Intelligence Artificielle', title:"Comment l'IA transforme le social media en 2026", desc:"Les agences qui utilisent l'IA génèrent 3x plus de contenu et réduisent leur temps de production de 70%. On vous explique comment.", author:'Mohamed Ali Souissi', date:'10 juin 2026', read:'5 min', bg:'linear-gradient(135deg,#EEF1FB,#C7D4FB)' },
+  { emoji:'📊', tag:'Analytics & KPIs', title:"Les 5 métriques clés à suivre pour vos clients en 2026", desc:"Reach, engagement, taux de conversion, sentiment score et ROI social — les 5 KPIs que tout community manager doit maîtriser.", author:'Mohamed Ali Souissi', date:'5 juin 2026', read:'7 min', bg:'linear-gradient(135deg,#FEF3C7,#FDE68A)' },
+  { emoji:'🌍', tag:'Stratégie digitale', title:"Guide complet : Instagram, LinkedIn, TikTok en 2026", desc:"Chaque réseau a ses propres codes. Ce guide vous donne les meilleures pratiques par plateforme pour maximiser l'engagement.", author:'Mohamed Ali Souissi', date:'1 juin 2026', read:'9 min', bg:'linear-gradient(135deg,#D1FAE5,#A7F3D0)' },
 ]
 
 export default function Home() {
   const nav = useNavigate()
-  const [chatOpen, setChatOpen] = useState(false)
+  const [chatOpen,  setChatOpen]  = useState(false)
   const [chatInput, setChatInput] = useState('')
-  const [messages, setMessages] = useState([
+  const [messages,  setMessages]  = useState([
     { from:'bot', text:"Bonjour ! 👋 Je suis Aura, votre assistante IA. Comment puis-je vous aider aujourd'hui ?" }
   ])
   const [botIdx, setBotIdx] = useState(1)
-  const [lang, setLang] = useState(0)
+  const [lang,   setLang]   = useState(0)
 
   const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior:'smooth', block:'start' })
 
@@ -65,7 +47,7 @@ export default function Home() {
     const txt = chatInput
     setMessages(m => [...m, { from:'user', text:txt }])
     setTimeout(() => setMessages(m => [...m, { from:'bot', text:BOT_REPLIES[botIdx % BOT_REPLIES.length] }]), 700)
-    setBotIdx(i => i+1)
+    setBotIdx(i => i + 1)
     setChatInput('')
   }
 
@@ -79,18 +61,18 @@ export default function Home() {
         </div>
         <div className="aura-nav-links">
           {[
-            { label:'Services',  id:'services'    },
-            { label:'AuraCRM',   id:'crm-preview' },
-            { label:'Tarifs',    id:'pricing'     },
-            { label:'Blog',      id:'blog'        },
+            { label:'Services', id:'services'    },
+            { label:'AuraCRM',  id:'crm-preview' },
+            { label:'Tarifs',   id:'pricing'     },
+            { label:'Blog',     id:'blog'        },
           ].map(({ label, id }) => (
             <button key={label} className="aura-nav-link" onClick={() => scrollTo(id)}>{label}</button>
           ))}
           <select value={lang} onChange={e => setLang(+e.target.value)} className="aura-lang-select">
             {LANGS.map((l,i) => <option key={i} value={i} style={{color:'#1B2A5A'}}>{l}</option>)}
           </select>
-          <button onClick={() => nav('/login')}    className="aura-btn-ghost">Connexion</button>
-          <button onClick={() => nav('/register')} className="aura-btn-nav">Démarrer →</button>
+          <button onClick={() => nav('/login')}   className="aura-btn-ghost">Connexion</button>
+          <button onClick={() => nav('/payment')} className="aura-btn-nav">Démarrer →</button>
         </div>
       </nav>
 
@@ -106,7 +88,7 @@ export default function Home() {
           AuraSocials combine expertise humaine et intelligence artificielle pour booster la présence digitale de vos clients. Un seul outil pour tout piloter.
         </p>
         <div className="aura-hero-btns">
-          <button onClick={() => nav('/register')} className="aura-btn-primary">
+          <button onClick={() => nav('/payment')} className="aura-btn-primary">
             Démarrer gratuitement <ChevronRight size={17}/>
           </button>
           <button onClick={() => scrollTo('crm-preview')} className="aura-btn-outline">
@@ -177,13 +159,17 @@ export default function Home() {
                 <div className="aura-crm-card-title">
                   <Brain size={14} style={{color:'#4A6CF7'}}/> IA — Suggestions du jour
                 </div>
-                {[['#4A6CF7',"Publier un carousel LinkedIn pour Nike France — Engagement prévu : 5.2%"],['#34D399',"Répondre aux 12 commentaires Instagram de Zara Paris"],['#FBBF24',"Boost Stories TikTok ce soir à 20h — heure de pic"]].map(([c,t]) => (
+                {[
+                  ['#4A6CF7',"Publier un carousel LinkedIn pour Nike France — Engagement prévu : 5.2%"],
+                  ['#34D399',"Répondre aux 12 commentaires Instagram de Zara Paris"],
+                  ['#FBBF24',"Boost Stories TikTok ce soir à 20h — heure de pic"],
+                ].map(([c,t]) => (
                   <div key={t} className="aura-ai-row">
                     <div className="aura-ai-dot" style={{background:c}}/>
                     <span className="aura-ai-text">{t}</span>
                   </div>
                 ))}
-                <button className="aura-ai-btn" onClick={() => nav('/register')}>✦ Essayer AuraCRM gratuitement</button>
+                <button className="aura-ai-btn" onClick={() => nav('/payment')}>✦ Essayer AuraCRM gratuitement</button>
               </div>
               <div className="aura-crm-card">
                 <div className="aura-crm-card-title">
@@ -204,8 +190,8 @@ export default function Home() {
             </div>
           </div>
           <div style={{textAlign:'center',marginTop:40}}>
-            <button onClick={() => nav('/register')} className="aura-btn-primary" style={{fontSize:16,padding:'16px 42px'}}>
-              Accéder à AuraCRM gratuitement <ChevronRight size={18}/>
+            <button onClick={() => nav('/payment')} className="aura-btn-primary" style={{fontSize:16,padding:'16px 42px'}}>
+              Accéder à AuraCRM <ChevronRight size={18}/>
             </button>
           </div>
         </div>
@@ -215,7 +201,12 @@ export default function Home() {
       <section style={{background:'#4A6CF7',padding:'48px'}}>
         <div className="aura-container">
           <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:40,textAlign:'center'}}>
-            {[['🌍','50+ langues','Interface disponible mondialement, RTL inclus'],['⚡','< 2 secondes','Temps de génération IA moyen'],['🔒','99.9% uptime','Disponibilité garantie en production'],['🤖','API Claude','Intelligence artificielle de pointe d\'Anthropic']].map(([icon,title,desc]) => (
+            {[
+              ['🌍','50+ langues','Interface disponible mondialement, RTL inclus'],
+              ['⚡','< 2 secondes','Temps de génération IA moyen'],
+              ['🔒','99.9% uptime','Disponibilité garantie en production'],
+              ['🤖','API Claude','Intelligence artificielle de pointe d\'Anthropic'],
+            ].map(([icon,title,desc]) => (
               <div key={title}>
                 <div style={{fontSize:36,marginBottom:10}}>{icon}</div>
                 <div style={{fontSize:24,fontWeight:800,color:'white',marginBottom:6}}>{title}</div>
@@ -250,9 +241,9 @@ export default function Home() {
           <p className="aura-section-sub">Adaptés à chaque taille d'agence — de la startup à l'enterprise.</p>
           <div className="aura-pricing-grid">
             {[
-              {name:'STARTER',price:'49€',per:'/mois',features:['5 clients','3 réseaux sociaux','50 posts / mois','Analytics basiques','Chatbot IA','Support email'],featured:false},
-              {name:'AGENCY',price:'149€',per:'/mois',features:['25 clients','Tous les réseaux','Posts illimités','IA générative complète','Analytics avancés','Calendrier éditorial','Support prioritaire'],featured:true},
-              {name:'ENTERPRISE',price:'Sur devis',per:'',features:['Clients illimités','IA personnalisée','API privée dédiée','Support 24/7 dédié','Onboarding sur mesure','SLA garanti'],featured:false},
+              { name:'STARTER',    price:'49€',      per:'/mois', featured:false, features:['5 clients','3 réseaux sociaux','50 posts / mois','Analytics basiques','Chatbot IA','Support email'] },
+              { name:'AGENCY',     price:'149€',     per:'/mois', featured:true,  features:['25 clients','Tous les réseaux','Posts illimités','IA générative complète','Analytics avancés','Calendrier éditorial','Support prioritaire'] },
+              { name:'ENTERPRISE', price:'Sur devis',per:'',      featured:false, features:['Clients illimités','IA personnalisée','API privée dédiée','Support 24/7 dédié','Onboarding sur mesure','SLA garanti'] },
             ].map(({ name, price, per, features, featured }) => (
               <div key={name} className={`aura-price-card ${featured?'featured':''}`}>
                 {featured && <div className="aura-popular-badge">★ POPULAIRE</div>}
@@ -260,7 +251,7 @@ export default function Home() {
                 <div className="aura-plan-price">{price}<span className="aura-plan-per">{per}</span></div>
                 <div className="aura-plan-divider"/>
                 {features.map(f => <div key={f} className="aura-plan-feature"><span className="aura-check">✓</span> {f}</div>)}
-                <button onClick={() => nav('/register')} className={`aura-plan-btn ${featured?'primary':''}`}>
+                <button onClick={() => nav('/payment')} className={`aura-plan-btn ${featured?'primary':''}`}>
                   Commencer maintenant
                 </button>
               </div>
@@ -279,7 +270,7 @@ export default function Home() {
           <p className="aura-section-sub">Stratégies, analyses et guides pratiques pour dominer le social media.</p>
           <div className="aura-blog-grid">
             {BLOG_POSTS.map(post => (
-              <div key={post.title} className="aura-blog-card" onClick={() => nav('/register')}>
+              <div key={post.title} className="aura-blog-card" onClick={() => nav('/payment')}>
                 <div className="aura-blog-thumb" style={{background:post.bg}}>{post.emoji}</div>
                 <div className="aura-blog-body">
                   <div className="aura-blog-tag">{post.tag}</div>
@@ -294,8 +285,129 @@ export default function Home() {
             ))}
           </div>
           <div style={{textAlign:'center',marginTop:40}}>
-            <button onClick={() => nav('/register')} className="aura-btn-outline" style={{borderColor:'#CBD5E1',color:'#374151',padding:'13px 32px'}}>
+            <button onClick={() => nav('/payment')} className="aura-btn-outline" style={{borderColor:'#CBD5E1',color:'#374151',padding:'13px 32px'}}>
               Voir tous les articles <ArrowRight size={16} style={{display:'inline',marginLeft:6}}/>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ── PITCH ── */}
+      <section className="aura-pitch">
+        <div className="aura-pitch-grid">
+          <div>
+            <span className="section-label" style={{background:'rgba(74,108,247,0.15)',borderColor:'rgba(74,108,247,0.3)',color:'#93AEFF'}}>🚀 Notre vision</span>
+            <h2 className="aura-pitch-title" style={{marginTop:16}}>
+              AuraSocials <em>réinvente</em><br/>le marketing digital
+            </h2>
+            <p className="aura-pitch-desc">
+              Les agences perdent 60% de leur temps sur des tâches répétitives : création de contenu, reporting, analyse. AuraSocials automatise tout ça — et vous laisse vous concentrer sur la stratégie et la relation client.
+            </p>
+            {[
+              { icon:'🤖', title:'IA qui génère, vous validez',   desc:"Claude génère des posts optimisés pour chaque réseau. Vous les approuvez en un clic. Plus besoin de partir d'une page blanche." },
+              { icon:'📊', title:'Un dashboard, tous vos clients', desc:'Gérez Instagram, LinkedIn, TikTok, Facebook et X de tous vos clients depuis une seule interface. Fini les onglets ouverts partout.' },
+              { icon:'🌍', title:'Vendu dans 40+ pays',            desc:'Interface disponible en 50+ langues. AuraSocials est pensé pour scaler de Tunis à Paris, de Madrid à Tokyo.' },
+            ].map(f => (
+              <div key={f.title} className="aura-pitch-feat">
+                <div className="aura-pitch-feat-icon">{f.icon}</div>
+                <div>
+                  <div className="aura-pitch-feat-title">{f.title}</div>
+                  <div className="aura-pitch-feat-text">{f.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div>
+            <div style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:24,padding:32}}>
+              <div style={{marginBottom:24,paddingBottom:20,borderBottom:'1px solid rgba(255,255,255,0.06)'}}>
+                <div style={{fontSize:13,color:'rgba(255,255,255,0.4)',marginBottom:4}}>AVANT AURASOCIALS</div>
+                <div style={{fontSize:15,color:'rgba(255,255,255,0.7)',marginBottom:12}}>Une agence de 5 personnes gère 15 clients :</div>
+                {[
+                  '4h / jour de création de contenu manuelle',
+                  '3 outils différents (Hootsuite, Buffer, Canva)',
+                  'Rapports Excel envoyés manuellement chaque semaine',
+                  '0 visibilité en temps réel sur les performances',
+                ].map(t => (
+                  <div key={t} style={{display:'flex',alignItems:'center',gap:10,marginBottom:8,fontSize:13,color:'#EF4444'}}>
+                    <span>✗</span> {t}
+                  </div>
+                ))}
+              </div>
+              <div>
+                <div style={{fontSize:13,color:'#34D399',marginBottom:4}}>AVEC AURASOCIALS</div>
+                <div style={{fontSize:15,color:'white',marginBottom:12}}>La même agence gère maintenant 48 clients :</div>
+                {[
+                  "30 min / jour — l'IA génère, vous validez",
+                  '1 seul outil pour tout piloter',
+                  'Dashboard temps réel, rapports auto en 1 clic',
+                  "Chiffre d'affaires x3.2 en 6 mois",
+                ].map(t => (
+                  <div key={t} style={{display:'flex',alignItems:'center',gap:10,marginBottom:8,fontSize:13,color:'#34D399'}}>
+                    <span>✓</span> {t}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CHIFFRES CLÉS ── */}
+      <section className="aura-numbers">
+        <div className="aura-container">
+          <div style={{textAlign:'center',marginBottom:16}}>
+            <span className="section-label">📈 Chiffres concrets</span>
+          </div>
+          <h2 className="aura-section-title">Pourquoi les agences choisissent AuraSocials</h2>
+          <p className="aura-section-sub">Données mesurées sur nos 500+ agences clientes en Tunisie et en Europe.</p>
+          <div className="aura-numbers-grid">
+            {[
+              { val:'-70%',  label:'Temps de création de contenu',    desc:"De 4h à 45 min/jour grâce à l'IA générative Claude",                                    emoji:'⏱️' },
+              { val:'×3.2',  label:'Croissance du portefeuille clients', desc:"Les agences AuraSocials gèrent en moyenne 3x plus de clients qu'avant",              emoji:'📈' },
+              { val:'98%',   label:'Taux de satisfaction client',      desc:"Mesuré après 6 mois d'utilisation — leaders du marché tunisien et européen",          emoji:'⭐' },
+              { val:'50+',   label:'Langues et marchés couverts',      desc:'De la Tunisie à l\'Europe, vendu dans 40 pays — le seul CRM social media vraiment mondial', emoji:'🌍' },
+            ].map(n => (
+              <div key={n.label} className="aura-number-card">
+                <div style={{fontSize:36,marginBottom:12}}>{n.emoji}</div>
+                <div className="aura-number-val">{n.val}</div>
+                <div className="aura-number-label">{n.label}</div>
+                <div className="aura-number-desc">{n.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── TÉMOIGNAGES ── */}
+      <section className="aura-testimonials">
+        <div className="aura-container">
+          <div style={{textAlign:'center',marginBottom:16}}>
+            <span className="section-label">💬 Témoignages</span>
+          </div>
+          <h2 className="aura-section-title">Ce que disent nos clients</h2>
+          <p className="aura-section-sub">Des agences tunisiennes et européennes qui ont transformé leur activité.</p>
+          <div className="aura-testi-grid">
+            {[
+              { text:'"AuraSocials a changé notre façon de travailler. On gère 3x plus de clients avec la même équipe. L\'IA génère des posts de qualité professionnelle en secondes."', name:'Sonia Ben Ali',   role:'CEO — Agence Digit, Tunis',             color:'#4A6CF7', initial:'S' },
+              { text:'"Le seul CRM qui comprend vraiment les besoins d\'une agence social media. L\'interface multilingue nous permet de gérer des clients en France, Espagne et Italie depuis Tunis."', name:'Mehdi Rahoui',  role:'Directeur — MediaPro Agency, Sfax',     color:'#059669', initial:'M' },
+              { text:'"Le générateur IA est bluffant. En 30 secondes, on a un post Instagram parfait pour chaque client, adapté à son secteur. C\'est un gain de temps incroyable."', name:'Laura Martinez', role:'Social Media Manager, Madrid',           color:'#F59E0B', initial:'L' },
+            ].map(t => (
+              <div key={t.name} className="aura-testi-card">
+                <div className="aura-testi-stars">★★★★★</div>
+                <div className="aura-testi-text">{t.text}</div>
+                <div className="aura-testi-author">
+                  <div className="aura-testi-av" style={{background:t.color}}>{t.initial}</div>
+                  <div>
+                    <div className="aura-testi-name">{t.name}</div>
+                    <div className="aura-testi-role">{t.role}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{textAlign:'center',marginTop:48}}>
+            <button onClick={() => nav('/payment')} className="aura-btn-primary" style={{fontSize:16,padding:'16px 48px'}}>
+              Rejoindre 500+ agences — Démarrer maintenant <ChevronRight size={18}/>
             </button>
           </div>
         </div>
@@ -308,7 +420,11 @@ export default function Home() {
             <span className="aura-footer-logo">AURA<span style={{fontSize:9,letterSpacing:6,opacity:0.4,display:'block',marginTop:1}}>SOCIALS</span></span>
             <p className="aura-footer-desc">L'agence social media nouvelle génération, propulsée par l'intelligence artificielle Claude d'Anthropic.</p>
           </div>
-          {[['Produit',['Site web','AuraCRM','Tarifs','Nouveautés','Roadmap']],['Support',['Documentation','Contact','FAQ','Status']],['Légal',['CGU','Confidentialité','Cookies','Mentions légales']]].map(([title,links]) => (
+          {[
+            ['Produit', ['Site web','AuraCRM','Tarifs','Nouveautés','Roadmap']],
+            ['Support', ['Documentation','Contact','FAQ','Status']],
+            ['Légal',   ['CGU','Confidentialité','Cookies','Mentions légales']],
+          ].map(([title, links]) => (
             <div key={title}>
               <div className="aura-footer-heading">{title}</div>
               {links.map(l => <button key={l} className="aura-footer-link" onClick={() => scrollTo('hero')}>{l}</button>)}
@@ -338,7 +454,7 @@ export default function Home() {
             </div>
             <div className="aura-chat-msgs">
               {messages.map((m,i) => (
-                <div key={i} className={m.from==='bot'?'aura-msg-bot':'aura-msg-user'}>{m.text}</div>
+                <div key={i} className={m.from==='bot' ? 'aura-msg-bot' : 'aura-msg-user'}>{m.text}</div>
               ))}
             </div>
             <div className="aura-chat-bar">
@@ -353,6 +469,7 @@ export default function Home() {
           <MessageSquare size={24}/>
         </button>
       </div>
+
     </div>
   )
 }

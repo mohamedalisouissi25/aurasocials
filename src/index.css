@@ -621,3 +621,76 @@ body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: anti
   padding:6px 16px; border-radius:99px; text-transform:uppercase;
   margin-bottom:16px;
 }
+
+/* ════ GOOGLE OAUTH MODAL ════ */
+.google-modal {
+  background: white; border-radius: 28px; padding: 40px 36px;
+  width: 100%; max-width: 400px;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.25);
+  animation: modalIn 0.2s ease;
+}
+.google-modal-header { text-align: center; margin-bottom: 28px; }
+.google-modal-header img { margin-bottom: 20px; }
+.google-modal-header h2 { font-size: 22px; font-weight: 500; color: #202124; margin-bottom: 6px; }
+.google-modal-header p  { font-size: 14px; color: #5f6368; }
+.google-account-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px; border-radius: 12px; cursor: pointer;
+  transition: background 0.15s; margin-bottom: 4px;
+}
+.google-account-row:hover { background: #F8F9FA; }
+.google-avatar {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: linear-gradient(135deg, #4A6CF7, #8B5CF6);
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 16px; font-weight: 700; flex-shrink: 0;
+}
+.google-acc-name  { font-size: 14px; font-weight: 500; color: #202124; }
+.google-acc-email { font-size: 12px; color: #5f6368; margin-top: 2px; }
+.google-modal-footer { border-top: 1px solid #e8eaed; margin-top: 20px; padding-top: 16px; display: flex; justify-content: space-between; align-items: center; }
+.google-footer-btn { font-size: 13px; color: #1a73e8; background: none; border: none; cursor: pointer; font-weight: 500; padding: 6px 12px; border-radius: 6px; font-family: inherit; }
+.google-footer-btn:hover { background: #e8f0fe; }
+
+/* ════ PAYMENT PAGE ════ */
+.pay-page { min-height: 100vh; background: #F8FAFF; padding: 60px 20px; }
+.pay-container { max-width: 1000px; margin: 0 auto; }
+.pay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+.pay-plan-card { background: white; border-radius: 20px; padding: 28px; border: 2px solid #E8ECF8; cursor: pointer; transition: all 0.2s; }
+.pay-plan-card.selected { border-color: #4A6CF7; box-shadow: 0 0 0 4px rgba(74,108,247,0.12); }
+.pay-plan-name  { font-size: 11px; font-weight: 700; color: #9CA3AF; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+.pay-plan-price { font-size: 36px; font-weight: 800; color: #111827; }
+.pay-form-box { background: white; border-radius: 20px; padding: 32px; border: 1px solid #E8ECF8; }
+.pay-input { width: 100%; border: 1.5px solid #E5E7EB; border-radius: 10px; padding: 12px 14px; font-size: 14px; font-family: inherit; outline: none; color: #111827; margin-bottom: 14px; }
+.pay-input:focus { border-color: #4A6CF7; }
+.pay-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pay-btn { width: 100%; background: #4A6CF7; color: white; border: none; padding: 15px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 8px; box-shadow: 0 4px 16px rgba(74,108,247,0.4); transition: all 0.2s; }
+.pay-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.pay-success { text-align: center; padding: 60px 20px; }
+.pay-success-icon { font-size: 72px; margin-bottom: 20px; }
+
+/* ════ HOME — SECTIONS PITCH ════ */
+.aura-pitch { background: #0C1635; padding: 100px 48px; }
+.aura-pitch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; max-width: 1100px; margin: 0 auto; }
+.aura-pitch-title { font-size: 40px; font-weight: 800; color: white; line-height: 1.15; margin-bottom: 20px; letter-spacing: -1px; }
+.aura-pitch-title em { color: #4A6CF7; font-style: normal; }
+.aura-pitch-desc { font-size: 16px; color: rgba(255,255,255,0.55); line-height: 1.75; margin-bottom: 28px; }
+.aura-pitch-feat { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 16px; }
+.aura-pitch-feat-icon { width: 40px; height: 40px; background: rgba(74,108,247,0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; }
+.aura-pitch-feat-text { font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.6; }
+.aura-pitch-feat-title { font-size: 14px; font-weight: 700; color: white; margin-bottom: 4px; }
+.aura-numbers { background: white; padding: 80px 48px; }
+.aura-numbers-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 24px; max-width: 1100px; margin: 0 auto; }
+.aura-number-card { background: #F8FAFF; border-radius: 20px; padding: 32px 24px; text-align: center; border: 1.5px solid #E8ECF8; transition: all 0.25s; }
+.aura-number-card:hover { transform: translateY(-5px); border-color: #4A6CF7; box-shadow: 0 20px 50px rgba(74,108,247,0.1); }
+.aura-number-val  { font-size: 44px; font-weight: 800; color: #1B2A5A; margin-bottom: 8px; }
+.aura-number-label{ font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+.aura-number-desc { font-size: 12px; color: #9CA3AF; line-height: 1.5; }
+.aura-testimonials { background: #F8FAFF; padding: 80px 48px; }
+.aura-testi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+.aura-testi-card { background: white; border-radius: 20px; padding: 28px; border: 1.5px solid #E8ECF8; }
+.aura-testi-stars { color: #F59E0B; font-size: 18px; margin-bottom: 14px; }
+.aura-testi-text { font-size: 14px; color: #374151; line-height: 1.7; margin-bottom: 20px; font-style: italic; }
+.aura-testi-author { display: flex; align-items: center; gap: 12px; }
+.aura-testi-av { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px; }
+.aura-testi-name { font-size: 13px; font-weight: 700; color: #111827; }
+.aura-testi-role { font-size: 12px; color: #9CA3AF; }
