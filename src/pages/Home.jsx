@@ -428,16 +428,33 @@ export default function Home() {
             <span className="aura-footer-logo">AURA<span style={{fontSize:9,letterSpacing:6,opacity:0.4,display:'block',marginTop:1}}>SOCIALS</span></span>
             <p className="aura-footer-desc">{t('footerDesc')}</p>
           </div>
-          {[
-            ['Produit', ['Site web','AuraCRM','Tarifs','Nouveautés']],
-            ['Support', ['Documentation','Contact','FAQ','Status']],
-            ['Légal',   ['CGU','Confidentialité','Cookies','Mentions légales']],
-          ].map(([title,links]) => (
-            <div key={title}>
-              <div className="aura-footer-heading">{title}</div>
-              {links.map(l => <button key={l} className="aura-footer-link" onClick={() => scrollTo('hero')}>{l}</button>)}
-            </div>
-          ))}
+
+          {/* Produit */}
+          <div>
+            <div className="aura-footer-heading">Produit</div>
+            <button className="aura-footer-link" onClick={() => scrollTo('hero')}>Site web</button>
+            <button className="aura-footer-link" onClick={() => nav('/login')}>AuraCRM</button>
+            <button className="aura-footer-link" onClick={() => scrollTo('pricing')}>Tarifs</button>
+            <button className="aura-footer-link" onClick={() => nav('/nouveautes')}>Nouveautés</button>
+          </div>
+
+          {/* Support */}
+          <div>
+            <div className="aura-footer-heading">Support</div>
+            <button className="aura-footer-link" onClick={() => nav('/documentation')}>Documentation</button>
+            <button className="aura-footer-link" onClick={() => nav('/contact')}>Contact</button>
+            <button className="aura-footer-link" onClick={() => nav('/faq')}>FAQ</button>
+            <button className="aura-footer-link" onClick={() => nav('/status')}>Status</button>
+          </div>
+
+          {/* Légal */}
+          <div>
+            <div className="aura-footer-heading">Légal</div>
+            <button className="aura-footer-link" onClick={() => nav('/cgu')}>CGU</button>
+            <button className="aura-footer-link" onClick={() => nav('/confidentialite')}>Confidentialité</button>
+            <button className="aura-footer-link" onClick={() => nav('/cookies')}>Cookies</button>
+            <button className="aura-footer-link" onClick={() => nav('/mentions-legales')}>Mentions légales</button>
+          </div>
         </div>
         <div className="aura-footer-bottom">
           © 2026 AuraSocials &nbsp;·&nbsp; Développé par <strong style={{color:'rgba(255,255,255,0.45)'}}>Mohamed Ali Souissi</strong> &nbsp;·&nbsp; PTT Bachelor 3 Tech For Business &nbsp;·&nbsp; PSTB 2025/2026
