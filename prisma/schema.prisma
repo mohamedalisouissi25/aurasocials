@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  company   String?
+  plan      String   @default("starter")
+  createdAt DateTime @default(now())
+  clients   Client[]
+}
+
+model Client {
+  id          Int      @id @default(autoincrement())
+  name        String
+  sector      String
+  networks    String
+  status      String   @default("Actif")
+  reach       String?
+  engagement  String?
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  posts       Post[]
+  createdAt   DateTime @default(now())
+}
+
+model Post {
+  id          Int       @id @default(autoincrement())
+  content     String
+  network     String
+  type        String    @default("post")
+  scheduledAt DateTime?
+  published   Boolean   @default(false)
+  aiGenerated Boolean   @default(false)
+  clientId    Int
+  client      Client    @relation(fields: [clientId], references: [id])
+  createdAt   DateTime  @default(now())
+}
+
+model AIGeneration {
+  id        Int      @id @default(autoincrement())
+  prompt    String
+  result    String
+  network   String
+  clientId  Int?
+  createdAt DateTime @default(now())
+}
