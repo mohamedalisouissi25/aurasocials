@@ -1,552 +1,437 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom'
 import {
-  User, Bell, Shield, CreditCard, Globe, Users, Key,
-  Camera, Check, Copy, Plus, Trash2, LogOut,
-  Palette, Link, Zap
+  LayoutDashboard, Users, Calendar, Brain, BarChart3,
+  Settings, LogOut, ChevronLeft, ChevronRight, Sparkles,
+  Bell, X, CheckCheck, AlertTriangle, TrendingUp, Info,
+  ArrowLeft, ExternalLink
 } from 'lucide-react'
+import CRMDashboard   from './CRMDashboard'
+import CRMClients     from './CRMClients'
+import CRMAIGenerator from './CRMAIGenerator'
+import CRMSettings    from './CRMSettings'
+import CRMInsights    from './CRMInsights'
+import { CRMSettingsProvider, useCRMSettings } from '../../context/CRMSettingsContext'
 
-const TABS = [
-  { id:'profile',       label:'Mon profil',      icon:User },
-  { id:'appearance',    label:'Apparence',        icon:Palette },
-  { id:'notifications', label:'Notifications',    icon:Bell },
-  { id:'security',      label:'Sécurité',         icon:Shield },
-  { id:'billing',       label:'Abonnement',       icon:CreditCard },
-  { id:'integrations',  label:'Intégrations',     icon:Link },
-  { id:'api',           label:'Clés API',         icon:Key },
-  { id:'team',          label:'Mon équipe',       icon:Users },
+const NET_C = { IG:'#E97729', LI:'#0A66C2', FB:'#1877F2', TK:'#111' }
+
+const INIT_NOTIFICATIONS = [
+  {
+    id:1, type:'alert', IconComp:AlertTriangle, color:'#EF4444', bg:'#FEE2E2',
+    title:'Commentaires négatifs en hausse',
+    desc:'Nike France Instagram — +34% de sentiment négatif détecté',
+    detail:'Une hausse significative de 34% des commentaires négatifs a été détectée sur le compte Instagram de Nike France. Les principaux sujets : délais de livraison (+18%), qualité produit (+9%), service client (+7%). Nous recommandons de répondre en priorité aux 12 commentaires critiques identifiés par le Crisis Radar.',
+    action:'Voir dans Insights IA', actionPath:'/crm/insights',
+    time:'Il y a 12 min', read:false,
+  },
+  {
+    id:2, type:'success', IconComp:TrendingUp, color:'#059669', bg:'#D1FAE5',
+    title:'Performance en hausse',
+    desc:"Café Lumière Instagram — Engagement +28% cette semaine",
+    detail:"Le compte Instagram de Café Lumière enregistre une semaine exceptionnelle : +28% d'engagement, +342 nouveaux abonnés. Le post \"Terrasse été 2026\" a atteint 12 400 personnes organiquement — meilleur résultat depuis le lancement du compte.",
+    action:'Voir les analytics', actionPath:'/crm/analytics',
+    time:'Il y a 1h', read:false,
+  },
+  {
+    id:3, type:'info', IconComp:Brain, color:'#4A6CF7', bg:'#EEF1FB',
+    title:'Rapport IA prêt',
+    desc:'Plan éditorial juillet 2026 généré pour Voyage & Liberté',
+    detail:'Le plan éditorial complet pour juillet 2026 a été généré pour Voyage & Liberté. Il comprend 28 publications réparties sur Instagram (12), TikTok (8), Facebook (8), avec les horaires optimaux, les hashtags recommandés et les formats suggérés pour chaque post.',
+    action:'Voir le générateur IA', actionPath:'/crm/ai',
+    time:'Il y a 2h', read:false,
+  },
+  {
+    id:4, type:'info', IconComp:Users, color:'#4A6CF7', bg:'#EEF1FB',
+    title:'Nouveau client ajouté',
+    desc:'TechStart SAS a été ajouté à votre portfolio',
+    detail:'TechStart SAS (secteur Tech & SaaS) a été ajouté à votre portefeuille. Réseaux assignés : LinkedIn. Premier post à programmer selon votre calendrier éditorial.',
+    action:'Voir les clients', actionPath:'/crm/clients',
+    time:'Hier 18:34', read:true,
+  },
+  {
+    id:5, type:'success', IconComp:CheckCheck, color:'#059669', bg:'#D1FAE5',
+    title:'Publication publiée avec succès',
+    desc:'Post Instagram Nike France publié à 18h00',
+    detail:"La publication Instagram programmée pour Nike France a été publiée avec succès à 18h00. Résultats après 30 minutes : 234 likes, 18 commentaires, 56 partages. Taux d'engagement initial : 4.2% — au-dessus de la moyenne du compte (3.8%).",
+    action:'Voir le calendrier', actionPath:'/crm/calendar',
+    time:'Hier 18:02', read:true,
+  },
 ]
 
-function Toggle({ on, onToggle }) {
-  return (
-    <div
-      onClick={onToggle}
-      style={{
-        position:'relative', width:44, height:24,
-        flexShrink:0, cursor:'pointer'
-      }}>
-      <div style={{
-        position:'absolute', inset:0,
-        background: on ? '#4A6CF7' : '#E5E7EB',
-        borderRadius:12,
-        transition:'background 0.2s',
-      }}>
-        <div style={{
-          position:'absolute',
-          top:3,
-          left: on ? 23 : 3,
-          width:18, height:18,
-          background:'white',
-          borderRadius:'50%',
-          transition:'left 0.2s',
-          boxShadow:'0 1px 4px rgba(0,0,0,0.2)',
-        }}/>
+// ── NOTIFICATION PANEL ───────────────────────────────────────────────────────
+function NotificationPanel({ notifs, setNotifs, onClose, onNavigate }) {
+  const [selected, setSelected] = useState(null)
+
+  const unread    = notifs.filter(n => !n.read).length
+  const markAll   = () => setNotifs(n => n.map(x => ({ ...x, read:true })))
+  const markOne   = (id) => setNotifs(n => n.map(x => x.id===id ? {...x,read:true} : x))
+  const removeOne = (id) => { setNotifs(n => n.filter(x => x.id!==id)); if(selected?.id===id) setSelected(null) }
+
+  const handleClick = (notif) => { markOne(notif.id); setSelected(notif) }
+
+  const DetailView = ({ notif }) => {
+    const Icon = notif.IconComp
+    return (
+      <div style={{flex:1,display:'flex',flexDirection:'column'}}>
+        <button onClick={() => setSelected(null)}
+          style={{display:'flex',alignItems:'center',gap:6,padding:'14px 20px',background:'none',border:'none',borderBottom:'1px solid #F3F4F6',cursor:'pointer',color:'#6B7280',fontSize:13,fontWeight:600,fontFamily:'inherit',width:'100%',textAlign:'left'}}>
+          <ArrowLeft size={14}/> Retour aux notifications
+        </button>
+        <div style={{padding:'20px',flex:1,overflowY:'auto'}}>
+          <div style={{display:'flex',alignItems:'flex-start',gap:12,marginBottom:16}}>
+            <div style={{width:44,height:44,borderRadius:12,background:notif.bg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              <Icon size={20} style={{color:notif.color}}/>
+            </div>
+            <div>
+              <div style={{fontSize:15,fontWeight:800,color:'#111827',marginBottom:4,lineHeight:1.3}}>{notif.title}</div>
+              <div style={{fontSize:11,color:'#9CA3AF'}}>{notif.time}</div>
+            </div>
+          </div>
+          <div style={{fontSize:14,color:'#374151',lineHeight:1.75,marginBottom:20,padding:'14px',background:'#F8FAFF',borderRadius:12,border:'1px solid #E8ECF8'}}>
+            {notif.detail}
+          </div>
+          <button onClick={() => { onNavigate(notif.actionPath); onClose() }}
+            style={{width:'100%',background:'#4A6CF7',color:'white',border:'none',padding:'12px',borderRadius:11,fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:'inherit',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:'0 4px 12px rgba(74,108,247,0.3)'}}>
+            <ExternalLink size={15}/> {notif.action}
+          </button>
+          <button onClick={() => { removeOne(notif.id); setSelected(null) }}
+            style={{width:'100%',background:'none',border:'1.5px solid #FEE2E2',color:'#EF4444',padding:'10px',borderRadius:10,fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit',marginTop:8}}>
+            Supprimer cette notification
+          </button>
+        </div>
       </div>
-    </div>
-  )
-}
-function Toast({ msg }) {
-  return msg ? <div className="toast">✓ &nbsp;{msg}</div> : null
-}
-
-export default function CRMSettings() {
-  const user = JSON.parse(localStorage.getItem('aura_user') || '{}')
-  const [tab,   setTab]   = useState('profile')
-  const [toast, setToast] = useState('')
-  const [copied, setCopied] = useState('')
-
-  const [profile, setProfile] = useState({
-    name:    user.name    || 'Mohamed Ali Souissi',
-    email:   user.email   || 'admin@aurasocials.com',
-    company: user.company || 'AuraSocials',
-    phone:   '+216 XX XXX XXX',
-    role:    'CEO & Fondateur',
-    bio:     'Fondateur d\'AuraSocials — plateforme CRM social media propulsée par l\'IA Claude.',
-    website: 'https://aurasocials.com',
-    timezone:'Europe/Paris',
-  })
-
-  const [notifs, setNotifs] = useState({
-    emailWeekly: true, emailAlerts: true, emailMarketing: false,
-    pushAll: true, pushComments: true, pushReports: true,
-    reportFreq: 'weekly',
-  })
-
-  const [appearance, setAppearance] = useState({
-    theme: 'light', lang: 'fr', density: 'comfortable', sidebarCollapsed: false,
-  })
-
-  const [pw, setPw] = useState({ current:'', next:'', confirm:'' })
-  const [twoFA, setTwoFA] = useState(false)
-
-  const [integrations, setIntegrations] = useState({
-    instagram: true, linkedin: true, facebook: false,
-    tiktok: false, twitter: false, claude: true,
-  })
-
-  const [team] = useState([
-    { name:'Mohamed Ali Souissi', email:'admin@aurasocials.com', role:'Admin',  color:'#4A6CF7', initial:'M' },
-    { name:'Aura Bot',            email:'bot@aurasocials.com',   role:'IA',     color:'#8B5CF6', initial:'🤖' },
-  ])
-  const [inviteEmail, setInviteEmail] = useState('')
-
-  const save = (msg='Modifications sauvegardées !') => {
-    localStorage.setItem('aura_user', JSON.stringify({ ...user, ...profile }))
-    setToast(msg)
-    setTimeout(() => setToast(''), 2800)
+    )
   }
 
-  const copyKey = (key, label) => {
-    navigator.clipboard.writeText(key)
-    setCopied(label)
-    setTimeout(() => setCopied(''), 2000)
-  }
-
-  const NET_INFO = [
-    { id:'instagram', label:'Instagram',   icon:'📸', color:'#E97729', desc:'Publier des posts, Reels, Stories' },
-    { id:'linkedin',  label:'LinkedIn',    icon:'💼', color:'#0A66C2', desc:'Articles, posts professionnels' },
-    { id:'facebook',  label:'Facebook',    icon:'👥', color:'#1877F2', desc:'Posts, photos, événements' },
-    { id:'tiktok',    label:'TikTok',      icon:'🎵', color:'#111',   desc:'Vidéos courtes, lives' },
-    { id:'twitter',   label:'X (Twitter)', icon:'🐦', color:'#1DA1F2', desc:'Threads, tweets, sondages' },
-    { id:'claude',    label:'Claude API',  icon:'🤖', color:'#4A6CF7', desc:'IA générative — Anthropic' },
-  ]
-
   return (
-    <div>
-      <Toast msg={toast}/>
-      <div style={{marginBottom:28}}>
-        <h2 style={{fontSize:22,fontWeight:800,color:'#111827'}}>Paramètres</h2>
-        <p style={{fontSize:14,color:'#9CA3AF',marginTop:4}}>Gérez votre compte, votre équipe et vos intégrations.</p>
-      </div>
-
-      <div className="settings-wrap">
-        {/* Sidebar tabs */}
-        <div>
-          <div className="settings-tabs">
-            {TABS.map(({ id, label, icon:Icon }) => (
-              <button key={id} onClick={() => setTab(id)} className={`settings-tab ${tab===id?'active':''}`}>
-                <Icon size={16}/> {label}
+    <div style={{
+      position:'absolute', top:'calc(100% + 12px)', right:0,
+      width:400, maxHeight:520, background:'white', borderRadius:20,
+      boxShadow:'0 20px 60px rgba(0,0,0,0.15)', border:'1px solid #F1F3F9',
+      zIndex:200, display:'flex', flexDirection:'column',
+      animation:'notifIn 0.2s ease', overflow:'hidden',
+    }}>
+      {selected ? <DetailView notif={selected}/> : (
+        <>
+          <div style={{padding:'16px 20px',borderBottom:'1px solid #F3F4F6',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
+            <div>
+              <div style={{fontSize:15,fontWeight:800,color:'#111827'}}>Notifications</div>
+              <div style={{fontSize:12,marginTop:2,color:unread>0?'#9CA3AF':'#059669'}}>
+                {unread>0 ? `${unread} non lue${unread>1?'s':''}` : '✓ Tout est lu'}
+              </div>
+            </div>
+            <div style={{display:'flex',gap:8,alignItems:'center'}}>
+              {unread>0 && (
+                <button onClick={markAll}
+                  style={{fontSize:11,fontWeight:700,color:'#4A6CF7',background:'#EEF1FB',border:'none',padding:'5px 11px',borderRadius:8,cursor:'pointer',fontFamily:'inherit'}}>
+                  Tout lire
+                </button>
+              )}
+              <button onClick={onClose}
+                style={{background:'none',border:'none',cursor:'pointer',color:'#9CA3AF',padding:4,display:'flex',alignItems:'center'}}>
+                <X size={16}/>
               </button>
-            ))}
-            <hr className="settings-section-divider"/>
-            <button className="settings-tab" style={{color:'#EF4444'}} onClick={() => { localStorage.removeItem('aura_user'); window.location.href = '/login' }}>
-              <LogOut size={16}/> Déconnexion
+            </div>
+          </div>
+          <div style={{overflowY:'auto',flex:1}}>
+            {notifs.length===0 ? (
+              <div style={{padding:'52px 20px',textAlign:'center'}}>
+                <div style={{fontSize:48,marginBottom:14}}>🔔</div>
+                <div style={{fontSize:15,fontWeight:700,color:'#111827',marginBottom:6}}>Aucune notification</div>
+                <div style={{fontSize:13,color:'#9CA3AF'}}>Vous êtes à jour ! Les alertes apparaîtront ici.</div>
+              </div>
+            ) : notifs.map(n => {
+              const Icon = n.IconComp
+              return (
+                <div key={n.id} onClick={() => handleClick(n)}
+                  style={{display:'flex',alignItems:'flex-start',gap:12,padding:'14px 20px',cursor:'pointer',background:n.read?'white':'#FAFBFF',borderBottom:'1px solid #F9FAFB',transition:'background 0.15s',position:'relative'}}
+                  onMouseEnter={e => e.currentTarget.style.background='#F8FAFF'}
+                  onMouseLeave={e => e.currentTarget.style.background=n.read?'white':'#FAFBFF'}>
+                  {!n.read && (
+                    <div style={{position:'absolute',top:20,right:48,width:7,height:7,borderRadius:'50%',background:'#4A6CF7'}}/>
+                  )}
+                  <div style={{width:36,height:36,borderRadius:10,background:n.bg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginTop:1}}>
+                    <Icon size={16} style={{color:n.color}}/>
+                  </div>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:13,fontWeight:n.read?500:700,color:'#111827',marginBottom:2,lineHeight:1.4}}>{n.title}</div>
+                    <div style={{fontSize:12,color:'#6B7280',lineHeight:1.5,marginBottom:3}}>{n.desc}</div>
+                    <div style={{fontSize:11,color:'#9CA3AF'}}>{n.time}</div>
+                  </div>
+                  <button onClick={e => { e.stopPropagation(); removeOne(n.id) }}
+                    style={{background:'none',border:'none',cursor:'pointer',color:'#D1D5DB',padding:4,display:'flex',alignItems:'center',flexShrink:0,marginTop:1}}>
+                    <X size={13}/>
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+          <div style={{padding:'12px 20px',borderTop:'1px solid #F3F4F6',textAlign:'center',flexShrink:0}}>
+            <button onClick={() => { onNavigate('/crm/settings'); onClose() }}
+              style={{fontSize:13,fontWeight:600,color:'#4A6CF7',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
+              Gérer les notifications →
             </button>
           </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+// ── CALENDAR PAGE ────────────────────────────────────────────────────────────
+function CalendarPage() {
+  const posts = {1:['IG','LI'],3:['FB'],5:['IG'],8:['LI','IG'],10:['TK'],12:['IG'],14:['FB','LI'],15:['IG'],17:['IG'],19:['LI'],21:['IG','FB'],22:['TK'],25:['IG'],27:['LI'],29:['FB','TK']}
+  return (
+    <div>
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:24}}>
+        <div>
+          <h2 style={{fontSize:22,fontWeight:800,color:'#111827'}}>Calendrier éditorial</h2>
+          <p style={{fontSize:14,color:'#9CA3AF',marginTop:4}}>Juin 2026 — Programmez vos publications</p>
         </div>
-
-        {/* Panel */}
-        <div className="settings-panel">
-
-          {/* ── PROFIL ── */}
-          {tab === 'profile' && (
-            <div>
-              <div className="settings-panel-title">Mon profil</div>
-              <div className="settings-panel-sub">Informations affichées dans AuraCRM et sur votre page publique.</div>
-              <div className="settings-avatar-wrap">
-                <div className="settings-avatar">{(profile.name||'M')[0].toUpperCase()}</div>
-                <div>
-                  <div style={{fontWeight:700,color:'#111827',marginBottom:4}}>{profile.name}</div>
-                  <div className="settings-avatar-info">{profile.role} · {profile.company}</div>
-                  <button className="settings-avatar-btn" style={{marginTop:8}}>
-                    <Camera size={13} style={{display:'inline',marginRight:5}}/> Changer la photo
-                  </button>
-                </div>
-              </div>
-              <div className="settings-grid-2">
-                <div className="settings-field">
-                  <label className="settings-label">Prénom & Nom</label>
-                  <input className="settings-input" value={profile.name} onChange={e => setProfile({...profile,name:e.target.value})}/>
-                </div>
-                <div className="settings-field">
-                  <label className="settings-label">Email professionnel</label>
-                  <input className="settings-input" type="email" value={profile.email} onChange={e => setProfile({...profile,email:e.target.value})}/>
-                </div>
-                <div className="settings-field">
-                  <label className="settings-label">Entreprise</label>
-                  <input className="settings-input" value={profile.company} onChange={e => setProfile({...profile,company:e.target.value})}/>
-                </div>
-                <div className="settings-field">
-                  <label className="settings-label">Rôle / Poste</label>
-                  <input className="settings-input" value={profile.role} onChange={e => setProfile({...profile,role:e.target.value})}/>
-                </div>
-                <div className="settings-field">
-                  <label className="settings-label">Téléphone</label>
-                  <input className="settings-input" value={profile.phone} onChange={e => setProfile({...profile,phone:e.target.value})}/>
-                </div>
-                <div className="settings-field">
-                  <label className="settings-label">Site web</label>
-                  <input className="settings-input" value={profile.website} onChange={e => setProfile({...profile,website:e.target.value})}/>
-                </div>
-              </div>
-              <div className="settings-field">
-                <label className="settings-label">Bio</label>
-                <textarea className="settings-textarea" rows={3} value={profile.bio} onChange={e => setProfile({...profile,bio:e.target.value})} style={{resize:'none'}}/>
-              </div>
-              <div className="settings-field">
-                <label className="settings-label">Fuseau horaire</label>
-                <select className="settings-select" value={profile.timezone} onChange={e => setProfile({...profile,timezone:e.target.value})}>
-                  {['Europe/Paris','Africa/Tunis','Europe/London','America/New_York','Asia/Tokyo','Asia/Shanghai'].map(tz => (
-                    <option key={tz}>{tz}</option>
-                  ))}
-                </select>
-              </div>
-              <div style={{display:'flex',gap:12,marginTop:8}}>
-                <button className="settings-save" onClick={() => save()}>✓ Sauvegarder</button>
-                <button className="settings-cancel">Annuler</button>
-              </div>
+        <button className="crm-btn"><Brain size={16}/> Générer avec IA</button>
+      </div>
+      <div className="crm-card">
+        <div className="cal-header">
+          {['LUN','MAR','MER','JEU','VEN','SAM','DIM'].map(d=><div key={d} className="cal-day-name">{d}</div>)}
+        </div>
+        <div className="cal-grid">
+          {Array.from({length:30},(_,i)=>i+1).map(d=>(
+            <div key={d} className="cal-cell">
+              <div className="cal-cell-num">{d}</div>
+              {(posts[d]||[]).map(n=><div key={n} className="cal-net-pill" style={{background:NET_C[n]}}>{n}</div>)}
             </div>
-          )}
-
-          {/* ── APPARENCE ── */}
-          {tab === 'appearance' && (
-            <div>
-              <div className="settings-panel-title">Apparence</div>
-              <div className="settings-panel-sub">Personnalisez l'interface AuraCRM selon vos préférences.</div>
-              <div className="settings-field">
-                <label className="settings-label">Thème</label>
-                <div style={{display:'flex',gap:12}}>
-                  {[{id:'light',label:'☀️ Clair',desc:'Interface blanche'},
-                    {id:'dark', label:'🌙 Sombre',desc:'Interface noire'},
-                    {id:'auto', label:'🖥️ Système',desc:'Suit votre OS'}].map(t => (
-                    <div key={t.id} onClick={() => setAppearance({...appearance,theme:t.id})}
-                      style={{flex:1,border:`2px solid ${appearance.theme===t.id?'#4A6CF7':'#E5E7EB'}`,borderRadius:12,padding:'14px 12px',cursor:'pointer',background:appearance.theme===t.id?'#EEF1FB':'white',textAlign:'center',transition:'all 0.15s'}}>
-                      <div style={{fontSize:22,marginBottom:6}}>{t.label.split(' ')[0]}</div>
-                      <div style={{fontSize:13,fontWeight:700,color:appearance.theme===t.id?'#4A6CF7':'#374151'}}>{t.label.split(' ')[1]}</div>
-                      <div style={{fontSize:11,color:'#9CA3AF'}}>{t.desc}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="settings-field">
-                <label className="settings-label">Langue de l'interface CRM</label>
-                <select className="settings-select" value={appearance.lang} onChange={e => setAppearance({...appearance,lang:e.target.value})}>
-                  <option value="fr">🇫🇷 Français</option>
-                  <option value="en">🇬🇧 English</option>
-                  <option value="ar">🇸🇦 العربية</option>
-                  <option value="es">🇪🇸 Español</option>
-                  <option value="de">🇩🇪 Deutsch</option>
-                </select>
-              </div>
-              <div className="settings-field">
-                <label className="settings-label">Densité d'affichage</label>
-                <select className="settings-select" value={appearance.density} onChange={e => setAppearance({...appearance,density:e.target.value})}>
-                  <option value="comfortable">Confortable (recommandé)</option>
-                  <option value="compact">Compact</option>
-                  <option value="spacious">Spacieux</option>
-                </select>
-              </div>
-              <div style={{display:'flex',gap:12,marginTop:8}}>
-                <button className="settings-save" onClick={() => save('Apparence mise à jour !')}>✓ Sauvegarder</button>
-              </div>
-            </div>
-          )}
-
-          {/* ── NOTIFICATIONS ── */}
-          {tab === 'notifications' && (
-            <div>
-              <div className="settings-panel-title">Notifications</div>
-              <div className="settings-panel-sub">Choisissez quand et comment AuraCRM vous notifie.</div>
-              <div style={{fontWeight:700,color:'#374151',fontSize:13,marginBottom:12,textTransform:'uppercase',letterSpacing:'0.5px'}}>📧 Par email</div>
-              {[
-                {key:'emailWeekly',   label:'Rapport hebdomadaire',      desc:'Résumé des performances de tous vos clients chaque lundi.'},
-                {key:'emailAlerts',   label:'Alertes importantes',       desc:'Baisse de performance, erreur de publication, compte déconnecté.'},
-                {key:'emailMarketing',label:'Nouveautés AuraSocials',    desc:'Nouvelles fonctionnalités, astuces, offres exclusives.'},
-              ].map(n => (
-                <div key={n.key} className="toggle-row">
-                  <div className="toggle-info">
-                    <div className="toggle-label">{n.label}</div>
-                    <div className="toggle-desc">{n.desc}</div>
-                  </div>
-                  <Toggle on={notifs[n.key]} onToggle={() => setNotifs({...notifs,[n.key]:!notifs[n.key]})}/>
-                </div>
-              ))}
-              <hr className="settings-section-divider"/>
-              <div style={{fontWeight:700,color:'#374151',fontSize:13,marginBottom:12,textTransform:'uppercase',letterSpacing:'0.5px'}}>🔔 Push & In-app</div>
-              {[
-                {key:'pushAll',      label:'Toutes les notifications',  desc:'Reçois toutes les alertes directement dans le CRM.'},
-                {key:'pushComments', label:'Nouveaux commentaires',     desc:'Quand un client reçoit un commentaire sur ses posts.'},
-                {key:'pushReports',  label:'Rapports IA prêts',        desc:'Quand une génération de contenu ou un rapport est disponible.'},
-              ].map(n => (
-                <div key={n.key} className="toggle-row">
-                  <div className="toggle-info">
-                    <div className="toggle-label">{n.label}</div>
-                    <div className="toggle-desc">{n.desc}</div>
-                  </div>
-                  <Toggle on={notifs[n.key]} onToggle={() => setNotifs({...notifs,[n.key]:!notifs[n.key]})}/>
-                </div>
-              ))}
-              <hr className="settings-section-divider"/>
-              <div className="settings-field">
-                <label className="settings-label">Fréquence des rapports automatiques</label>
-                <select className="settings-select" value={notifs.reportFreq} onChange={e => setNotifs({...notifs,reportFreq:e.target.value})}>
-                  <option value="daily">Quotidien (chaque matin)</option>
-                  <option value="weekly">Hebdomadaire (chaque lundi)</option>
-                  <option value="monthly">Mensuel (1er du mois)</option>
-                  <option value="never">Désactivé</option>
-                </select>
-              </div>
-              <button className="settings-save" onClick={() => save('Préférences notifications sauvegardées !')}>✓ Sauvegarder</button>
-            </div>
-          )}
-
-          {/* ── SÉCURITÉ ── */}
-          {tab === 'security' && (
-            <div>
-              <div className="settings-panel-title">Sécurité</div>
-              <div className="settings-panel-sub">Protégez votre compte et gérez vos sessions actives.</div>
-              <div style={{fontWeight:700,color:'#374151',fontSize:13,marginBottom:16,textTransform:'uppercase',letterSpacing:'0.5px'}}>🔑 Changer le mot de passe</div>
-              <div className="settings-field">
-                <label className="settings-label">Mot de passe actuel</label>
-                <input className="settings-input" type="password" placeholder="••••••••" value={pw.current} onChange={e => setPw({...pw,current:e.target.value})}/>
-              </div>
-              <div className="settings-grid-2">
-                <div className="settings-field">
-                  <label className="settings-label">Nouveau mot de passe</label>
-                  <input className="settings-input" type="password" placeholder="Min. 8 caractères" value={pw.next} onChange={e => setPw({...pw,next:e.target.value})}/>
-                </div>
-                <div className="settings-field">
-                  <label className="settings-label">Confirmer le nouveau</label>
-                  <input className="settings-input" type="password" placeholder="Répétez le mot de passe" value={pw.confirm} onChange={e => setPw({...pw,confirm:e.target.value})}/>
-                </div>
-              </div>
-              {pw.next && (
-                <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:16}}>
-                  {[{l:'8 caractères min.',ok:pw.next.length>=8},{l:'Une majuscule',ok:/[A-Z]/.test(pw.next)},{l:'Un chiffre',ok:/[0-9]/.test(pw.next)},{l:'Un symbole',ok:/[^A-Za-z0-9]/.test(pw.next)}].map(c=>(
-                    <span key={c.l} style={{fontSize:12,color:c.ok?'#059669':'#9CA3AF',display:'flex',alignItems:'center',gap:4}}>
-                      {c.ok?'✓':'○'} {c.l}
-                    </span>
-                  ))}
-                </div>
-              )}
-              <button className="settings-save" onClick={() => { setPw({current:'',next:'',confirm:''}); save('Mot de passe mis à jour !') }}>
-                🔒 Mettre à jour le mot de passe
-              </button>
-              <hr className="settings-section-divider"/>
-              <div style={{fontWeight:700,color:'#374151',fontSize:13,marginBottom:16,textTransform:'uppercase',letterSpacing:'0.5px'}}>🛡️ Authentification à deux facteurs (2FA)</div>
-              <div className="toggle-row" style={{marginBottom:24}}>
-                <div className="toggle-info">
-                  <div className="toggle-label">Activer la 2FA</div>
-                  <div className="toggle-desc">Sécurisez votre compte avec Google Authenticator ou SMS. Fortement recommandé.</div>
-                </div>
-                <Toggle on={twoFA} onToggle={() => { setTwoFA(!twoFA); save(twoFA?'2FA désactivée.':'2FA activée ! 🛡️') }}/>
-              </div>
-              <hr className="settings-section-divider"/>
-              <div style={{fontWeight:700,color:'#374151',fontSize:13,marginBottom:16,textTransform:'uppercase',letterSpacing:'0.5px'}}>💻 Sessions actives</div>
-              {[
-                {device:'Chrome — Windows 11',     location:'Tunis, TN',    time:'Maintenant',    current:true},
-                {device:'Safari — iPhone 15',       location:'Tunis, TN',    time:'Il y a 2h',     current:false},
-                {device:'Firefox — macOS',          location:'Paris, FR',    time:'Hier 18:34',    current:false},
-              ].map((s,i) => (
-                <div key={i} style={{display:'flex',alignItems:'center',gap:12,padding:'12px 0',borderBottom:'1px solid #F9FAFB'}}>
-                  <div style={{width:40,height:40,background:'#F8FAFF',borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',fontSize:18}}>
-                    {s.device.includes('Chrome')?'🌐':s.device.includes('Safari')?'📱':'🦊'}
-                  </div>
-                  <div style={{flex:1}}>
-                    <div style={{fontSize:13,fontWeight:600,color:'#111827'}}>{s.device}</div>
-                    <div style={{fontSize:12,color:'#9CA3AF'}}>{s.location} · {s.time}</div>
-                  </div>
-                  {s.current
-                    ? <span style={{fontSize:11,fontWeight:700,background:'#D1FAE5',color:'#059669',padding:'3px 10px',borderRadius:99}}>Actuelle</span>
-                    : <button style={{background:'none',border:'1.5px solid #FEE2E2',borderRadius:8,padding:'5px 12px',cursor:'pointer',color:'#EF4444',fontSize:12,fontWeight:600,fontFamily:'inherit'}}>Révoquer</button>
-                  }
-                </div>
-              ))}
-              <hr className="settings-section-divider"/>
-              <div className="danger-zone">
-                <div className="danger-title">⚠️ Zone de danger</div>
-                <div className="danger-desc">La suppression de votre compte est irréversible. Toutes vos données seront effacées définitivement.</div>
-                <button className="danger-btn">Supprimer mon compte</button>
-              </div>
-            </div>
-          )}
-
-          {/* ── ABONNEMENT ── */}
-          {tab === 'billing' && (
-            <div>
-              <div className="settings-panel-title">Abonnement & Facturation</div>
-              <div className="settings-panel-sub">Gérez votre plan, votre historique de paiement et vos informations de facturation.</div>
-              <div style={{background:'linear-gradient(135deg,#1B2A5A,#2E3F7A)',borderRadius:20,padding:'28px 32px',marginBottom:24}}>
-                <div className="plan-badge"><Zap size={12}/> Plan actuel</div>
-                <div style={{fontSize:28,fontWeight:800,color:'white',marginBottom:4}}>AGENCY</div>
-                <div style={{fontSize:15,color:'rgba(255,255,255,0.6)',marginBottom:20}}>149 € / mois · Renouvellement le 13 août 2026</div>
-                <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:16}}>
-                  {[['25','Clients max'],['∞','Posts/mois'],['50+','Langues'],['IA','Générative']].map(([v,l])=>(
-                    <div key={l} style={{textAlign:'center'}}>
-                      <div style={{fontSize:22,fontWeight:800,color:'white'}}>{v}</div>
-                      <div style={{fontSize:11,color:'rgba(255,255,255,0.5)',textTransform:'uppercase',letterSpacing:'0.5px'}}>{l}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div style={{display:'flex',gap:12,marginBottom:28}}>
-                <button className="settings-save" onClick={() => window.location.href='/payment'}>⬆️ Passer en Enterprise</button>
-                <button className="settings-cancel">Annuler l'abonnement</button>
-              </div>
-              <div style={{fontWeight:700,color:'#374151',fontSize:13,marginBottom:16,textTransform:'uppercase',letterSpacing:'0.5px'}}>💳 Moyen de paiement</div>
-              <div style={{display:'flex',alignItems:'center',gap:14,padding:'14px 16px',border:'1.5px solid #E5E7EB',borderRadius:12,marginBottom:20}}>
-                <div style={{fontSize:24}}>💳</div>
-                <div style={{flex:1}}>
-                  <div style={{fontSize:14,fontWeight:700,color:'#111827'}}>Visa se terminant par 4242</div>
-                  <div style={{fontSize:12,color:'#9CA3AF'}}>Expiration : 08/2028</div>
-                </div>
-                <button className="settings-cancel" style={{fontSize:12}}>Modifier</button>
-              </div>
-              <div style={{fontWeight:700,color:'#374151',fontSize:13,marginBottom:16,textTransform:'uppercase',letterSpacing:'0.5px'}}>🧾 Historique de paiement</div>
-              {[
-                {date:'13 juil. 2026',amount:'149,00 €',status:'Payé'},
-                {date:'13 juin 2026',amount:'149,00 €',status:'Payé'},
-                {date:'13 mai 2026',amount:'49,00 €',status:'Payé'},
-              ].map((inv,i)=>(
-                <div key={i} style={{display:'flex',alignItems:'center',gap:12,padding:'12px 0',borderBottom:'1px solid #F9FAFB'}}>
-                  <div style={{flex:1,fontSize:13,color:'#374151'}}>{inv.date}</div>
-                  <div style={{fontWeight:700,fontSize:13,color:'#111827'}}>{inv.amount}</div>
-                  <span style={{fontSize:11,fontWeight:700,background:'#D1FAE5',color:'#059669',padding:'3px 10px',borderRadius:99}}>{inv.status}</span>
-                  <button style={{background:'none',border:'none',cursor:'pointer',color:'#4A6CF7',fontSize:12,fontWeight:600,fontFamily:'inherit'}}>PDF</button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* ── INTÉGRATIONS ── */}
-          {tab === 'integrations' && (
-            <div>
-              <div className="settings-panel-title">Intégrations</div>
-              <div className="settings-panel-sub">Connectez vos réseaux sociaux et outils tiers à AuraCRM.</div>
-              <div style={{fontWeight:700,color:'#374151',fontSize:13,marginBottom:16,textTransform:'uppercase',letterSpacing:'0.5px'}}>📱 Réseaux sociaux</div>
-              {NET_INFO.slice(0,5).map(net => (
-                <div key={net.id} className={`integration-row ${integrations[net.id]?'on':''}`}>
-                  <div className="integration-left">
-                    <div className="integration-icon" style={{background:`${net.color}20`}}>{net.icon}</div>
-                    <div>
-                      <div className="integration-name">{net.label}</div>
-                      <div className={`integration-status ${integrations[net.id]?'ok':''}`}>
-                        {integrations[net.id] ? '✓ Connecté · Compte vérifié' : net.desc}
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setIntegrations({...integrations,[net.id]:!integrations[net.id]})}
-                    className={`integration-btn ${integrations[net.id]?'on':''}`}>
-                    {integrations[net.id] ? '✓ Connecté' : 'Connecter'}
-                  </button>
-                </div>
-              ))}
-              <hr className="settings-section-divider"/>
-              <div style={{fontWeight:700,color:'#374151',fontSize:13,marginBottom:16,textTransform:'uppercase',letterSpacing:'0.5px'}}>🤖 Intelligence Artificielle</div>
-              <div className={`integration-row ${integrations.claude?'on':''}`}>
-                <div className="integration-left">
-                  <div className="integration-icon" style={{background:'#EEF1FB'}}>🤖</div>
-                  <div>
-                    <div className="integration-name">Claude API (Anthropic)</div>
-                    <div className={`integration-status ${integrations.claude?'ok':''}`}>
-                      {integrations.claude ? '✓ Connecté · claude-sonnet-4-6 · 200k tokens' : 'Génération IA de contenu'}
-                    </div>
-                  </div>
-                </div>
-                <button onClick={() => setIntegrations({...integrations,claude:!integrations.claude})} className={`integration-btn ${integrations.claude?'on':''}`}>
-                  {integrations.claude ? '✓ Actif' : 'Connecter'}
-                </button>
-              </div>
-              <button className="settings-save" style={{marginTop:20}} onClick={() => save('Intégrations sauvegardées !')}>✓ Sauvegarder</button>
-            </div>
-          )}
-
-          {/* ── API ── */}
-          {tab === 'api' && (
-            <div>
-              <div className="settings-panel-title">Clés API</div>
-              <div className="settings-panel-sub">Gérez vos clés API pour connecter AuraCRM à vos propres outils.</div>
-              <div style={{background:'#FEF3C7',border:'1px solid #FDE68A',borderRadius:12,padding:'12px 16px',marginBottom:24,fontSize:13,color:'#92400E'}}>
-                ⚠️ Ne partagez jamais vos clés API. Elles donnent accès complet à votre compte.
-              </div>
-              {[
-                {label:'Clé API AuraSocials (Production)', key:'ask_live_xxxxxxxxx•••••••••••••••', active:true},
-                {label:'Clé API AuraSocials (Test)',       key:'ask_test_xxxxxxxxx•••••••••••••••', active:false},
-              ].map(k => (
-                <div key={k.label} style={{marginBottom:16}}>
-                  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
-                    <label className="settings-label" style={{margin:0}}>{k.label}</label>
-                    <span style={{fontSize:11,fontWeight:700,padding:'3px 10px',borderRadius:99,background:k.active?'#D1FAE5':'#F3F4F6',color:k.active?'#059669':'#6B7280'}}>{k.active?'Active':'Test'}</span>
-                  </div>
-                  <div className="api-key-box">
-                    <span>{k.key}</span>
-                    <button className="api-copy-btn" onClick={() => copyKey(k.key, k.label)}>
-                      {copied===k.label ? <><Check size={11}/> Copié</> : <><Copy size={11}/> Copier</>}
-                    </button>
-                  </div>
-                </div>
-              ))}
-              <button className="settings-save" style={{marginTop:8}} onClick={() => save('Nouvelle clé générée !')}>
-                <Plus size={14} style={{display:'inline',marginRight:6}}/> Générer une nouvelle clé
-              </button>
-              <hr className="settings-section-divider"/>
-              <div style={{fontWeight:700,color:'#374151',fontSize:13,marginBottom:16,textTransform:'uppercase',letterSpacing:'0.5px'}}>🌐 Webhooks</div>
-              <div className="settings-field">
-                <label className="settings-label">URL de webhook</label>
-                <input className="settings-input" placeholder="https://votre-serveur.com/webhook/aurasocials"/>
-              </div>
-              <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:16}}>
-                {['Nouvelle publication','Nouveau client','Rapport IA prêt','Alerte performance'].map(ev => (
-                  <span key={ev} style={{padding:'5px 12px',background:'#EEF1FB',borderRadius:99,fontSize:12,fontWeight:600,color:'#4A6CF7'}}>{ev}</span>
-                ))}
-              </div>
-              <button className="settings-save" onClick={() => save('Webhook configuré !')}>✓ Enregistrer le webhook</button>
-            </div>
-          )}
-
-          {/* ── ÉQUIPE ── */}
-          {tab === 'team' && (
-            <div>
-              <div className="settings-panel-title">Mon équipe</div>
-              <div className="settings-panel-sub">Invitez des collaborateurs et gérez leurs accès à AuraCRM.</div>
-              <div style={{background:'#EEF1FB',borderRadius:14,padding:'16px 20px',marginBottom:24,display:'flex',alignItems:'center',gap:12}}>
-                <div style={{fontSize:24}}>👥</div>
-                <div>
-                  <div style={{fontSize:14,fontWeight:700,color:'#1B2A5A'}}>2 / 5 membres · Plan AGENCY</div>
-                  <div style={{fontSize:12,color:'#6B7280'}}>Passez en Enterprise pour des membres illimités.</div>
-                </div>
-              </div>
-              <div style={{marginBottom:20}}>
-                {team.map(m => (
-                  <div key={m.email} className="member-row">
-                    <div className="member-av" style={{background:m.color}}>{m.initial}</div>
-                    <div style={{flex:1}}>
-                      <div className="member-name">{m.name}</div>
-                      <div className="member-email">{m.email}</div>
-                    </div>
-                    <span className={`member-badge ${m.role==='Admin'?'admin':'member'}`}>{m.role}</span>
-                    {m.role !== 'Admin' && (
-                      <button style={{background:'none',border:'none',cursor:'pointer',color:'#EF4444',padding:'4px 8px'}}><Trash2 size={14}/></button>
-                    )}
-                  </div>
-                ))}
-              </div>
-              <div style={{fontWeight:700,color:'#374151',fontSize:13,marginBottom:12,textTransform:'uppercase',letterSpacing:'0.5px'}}>✉️ Inviter un membre</div>
-              <div style={{display:'flex',gap:12}}>
-                <input className="settings-input" style={{flex:1}} placeholder="email@collaborateur.com" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)}/>
-                <select className="settings-select" style={{width:140}}>
-                  <option>Member</option>
-                  <option>Admin</option>
-                  <option>Lecteur</option>
-                </select>
-                <button className="settings-save" onClick={() => { setInviteEmail(''); save(`Invitation envoyée à ${inviteEmail || 'votre collaborateur'} !`) }}>
-                  <Plus size={15}/>
-                </button>
-              </div>
-            </div>
-          )}
-
+          ))}
         </div>
       </div>
     </div>
   )
 }
 
-const NET_INFO = [
-  { id:'instagram', label:'Instagram',   icon:'📸', color:'#E97729', desc:'Publier des posts, Reels, Stories' },
-  { id:'linkedin',  label:'LinkedIn',    icon:'💼', color:'#0A66C2', desc:'Articles, posts professionnels' },
-  { id:'facebook',  label:'Facebook',    icon:'👥', color:'#1877F2', desc:'Posts, photos, événements' },
-  { id:'tiktok',    label:'TikTok',      icon:'🎵', color:'#111',   desc:'Vidéos courtes, lives' },
-  { id:'twitter',   label:'X (Twitter)', icon:'🐦', color:'#1DA1F2', desc:'Threads, tweets, sondages' },
-  { id:'claude',    label:'Claude API',  icon:'🤖', color:'#4A6CF7', desc:'IA générative — Anthropic' },
-]
+// ── ANALYTICS PAGE ───────────────────────────────────────────────────────────
+function AnalyticsPage() {
+  const networks = [
+    {name:'Instagram',color:'#E97729',followers:'12.4K',reach:'45.2K',engagement:'4.8%',posts:32,bars:[{l:'Reach',v:78},{l:'Engagement',v:85},{l:'Followers',v:62}]},
+    {name:'LinkedIn', color:'#0A66C2',followers:'3.2K', reach:'18.7K',engagement:'3.2%',posts:15,bars:[{l:'Reach',v:45},{l:'Engagement',v:55},{l:'Followers',v:38}]},
+    {name:'Facebook', color:'#1877F2',followers:'8.1K', reach:'22.3K',engagement:'2.1%',posts:20,bars:[{l:'Reach',v:52},{l:'Engagement',v:35},{l:'Followers',v:60}]},
+    {name:'TikTok',   color:'#111',   followers:'5.6K', reach:'89.1K',engagement:'7.3%',posts:12,bars:[{l:'Reach',v:95},{l:'Engagement',v:92},{l:'Followers',v:48}]},
+  ]
+  return (
+    <div>
+      <div style={{marginBottom:24}}>
+        <h2 style={{fontSize:22,fontWeight:800,color:'#111827'}}>Analytics</h2>
+        <p style={{fontSize:14,color:'#9CA3AF',marginTop:4}}>Vue globale de vos performances</p>
+      </div>
+      <div className="crm-kpi-grid" style={{marginBottom:24}}>
+        {[['2.4M','Impressions totales','+8%'],['29.3K','Abonnés totaux','+3.2%'],['175K','Reach moyen','+5.1%'],['79','Posts publiés','ce mois']].map(([v,l,d])=>(
+          <div key={l} className="crm-kpi-card">
+            <div className="crm-kpi-value">{v}</div>
+            <div style={{fontSize:13,color:'#6B7280',margin:'4px 0'}}>{l}</div>
+            <div style={{fontSize:12,fontWeight:600,color:'#059669'}}>{d}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
+        {networks.map(n=>(
+          <div key={n.name} className="analytics-net-card">
+            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:16}}>
+              <div style={{width:12,height:12,borderRadius:'50%',background:n.color}}/>
+              <span style={{fontSize:15,fontWeight:700,color:'#111827'}}>{n.name}</span>
+              <span style={{marginLeft:'auto',fontSize:12,color:'#9CA3AF'}}>{n.posts} posts</span>
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12,marginBottom:16}}>
+              {[['Abonnés',n.followers],['Reach',n.reach],['Engagement',n.engagement]].map(([k,v])=>(
+                <div key={k}>
+                  <div style={{fontSize:11,color:'#9CA3AF',marginBottom:3}}>{k}</div>
+                  <div style={{fontSize:16,fontWeight:700,color:'#111827'}}>{v}</div>
+                </div>
+              ))}
+            </div>
+            <div className="analytics-bar-wrap">
+              {n.bars.map(b=>(
+                <div key={b.l} className="analytics-bar-row">
+                  <div className="analytics-bar-label">{b.l}</div>
+                  <div className="analytics-bar-bg"><div className="analytics-bar-fill" style={{width:`${b.v}%`,background:n.color}}/></div>
+                  <div className="analytics-bar-val">{b.v}%</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── CRM LAYOUT INNER ─────────────────────────────────────────────────────────
+function CRMLayoutInner() {
+  const nav  = useNavigate()
+  const loc  = useLocation()
+  const { tr } = useCRMSettings()
+
+  const [collapsed,  setCollapsed]  = useState(false)
+  const [showNotifs, setShowNotifs] = useState(false)
+  const [notifs,     setNotifs]     = useState(INIT_NOTIFICATIONS)
+  const bellRef = useRef(null)
+  const user = JSON.parse(localStorage.getItem('aura_user') || '{}')
+
+  const unreadCount = notifs.filter(n => !n.read).length
+
+  const NAV_ITEMS = [
+    { path:'/crm',           label:tr('dashboard'),    icon:LayoutDashboard },
+    { path:'/crm/clients',   label:tr('clients'),      icon:Users },
+    { path:'/crm/calendar',  label:tr('publications'), icon:Calendar },
+    { path:'/crm/ai',        label:tr('aiGenerator'),  icon:Brain },
+    { path:'/crm/analytics', label:tr('analytics'),    icon:BarChart3 },
+    { path:'/crm/insights',  label:tr('insights'),     icon:Sparkles },
+  ]
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (bellRef.current && !bellRef.current.contains(e.target)) setShowNotifs(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const logout = () => { localStorage.removeItem('aura_user'); nav('/login') }
+
+  const allPaths = [
+    ...NAV_ITEMS,
+    { path:'/crm/settings', label:tr('settings'), icon:Settings },
+  ]
+  const currentPage = allPaths.find(n =>
+    n.path === loc.pathname || (n.path !== '/crm' && loc.pathname.startsWith(n.path))
+  )
+  const isActive = (path) =>
+    loc.pathname === path || (path !== '/crm' && loc.pathname.startsWith(path))
+
+  return (
+    <div className="crm-wrap">
+
+      {/* ── SIDEBAR ── */}
+      <aside className={`crm-sidebar ${collapsed?'closed':'open'}`}>
+        <div className="crm-sidebar-top">
+          {!collapsed && <span className="crm-sidebar-logo">AURA<span className="crm-sidebar-logo-sub">CRM</span></span>}
+          {collapsed  && <Brain size={22} style={{color:'#4A6CF7'}}/>}
+        </div>
+        <button className="crm-collapse-btn" onClick={() => setCollapsed(!collapsed)}>
+          {collapsed ? <ChevronRight size={13}/> : <ChevronLeft size={13}/>}
+        </button>
+
+        <nav className="crm-nav">
+          {NAV_ITEMS.map(({ path, label, icon:Icon }) => (
+            <button key={path} onClick={() => nav(path)}
+              className={`crm-nav-item ${isActive(path)?'active':''}`}>
+              <Icon size={18} style={{flexShrink:0}}/>
+              {!collapsed && <span>{label}</span>}
+              {!collapsed && path==='/crm/insights' && (
+                <span style={{marginLeft:'auto',fontSize:9,fontWeight:700,padding:'2px 6px',background:'linear-gradient(135deg,#4A6CF7,#8B5CF6)',color:'white',borderRadius:99}}>NEW</span>
+              )}
+            </button>
+          ))}
+        </nav>
+
+        <div className="crm-nav-bottom">
+          <button onClick={() => nav('/crm/settings')}
+            className={`crm-nav-item ${isActive('/crm/settings')?'active':''}`}
+            style={{width:'100%'}}>
+            <Settings size={17} style={{flexShrink:0}}/>
+            {!collapsed && <span>{tr('settings')}</span>}
+          </button>
+          <button onClick={logout}
+            className="crm-nav-item crm-nav-item-danger"
+            style={{width:'100%'}}>
+            <LogOut size={17} style={{flexShrink:0}}/>
+            {!collapsed && <span>{tr('logout')}</span>}
+          </button>
+        </div>
+      </aside>
+
+      {/* ── MAIN ── */}
+      <div className="crm-main">
+        <header className="crm-topbar">
+          <span className="crm-topbar-title">{currentPage?.label || tr('dashboard')}</span>
+          <div className="crm-topbar-right">
+
+            {/* Bell */}
+            <div ref={bellRef} style={{position:'relative'}}>
+              <button onClick={() => setShowNotifs(!showNotifs)}
+                style={{
+                  position:'relative',
+                  background: showNotifs ? '#EEF1FB' : 'none',
+                  border:'none', cursor:'pointer',
+                  color: showNotifs ? '#4A6CF7' : '#9CA3AF',
+                  padding:8, borderRadius:10,
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                  transition:'all 0.15s',
+                }}>
+                <Bell size={18}/>
+                {unreadCount > 0 && (
+                  <span style={{
+                    position:'absolute', top:4, right:4,
+                    minWidth:16, height:16, background:'#EF4444',
+                    borderRadius:99, color:'white',
+                    fontSize:9, fontWeight:800, padding:'0 3px',
+                    display:'flex', alignItems:'center', justifyContent:'center',
+                    border:'2px solid white', lineHeight:1,
+                  }}>
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+              {showNotifs && (
+                <NotificationPanel
+                  notifs={notifs}
+                  setNotifs={setNotifs}
+                  onClose={() => setShowNotifs(false)}
+                  onNavigate={(path) => nav(path)}
+                />
+              )}
+            </div>
+
+            {/* User */}
+            <div onClick={() => nav('/crm/settings')}
+              style={{display:'flex',alignItems:'center',gap:10,cursor:'pointer',padding:'6px 10px',borderRadius:10,transition:'background 0.15s'}}
+              onMouseEnter={e => e.currentTarget.style.background='#F8FAFF'}
+              onMouseLeave={e => e.currentTarget.style.background='transparent'}>
+              <div className="crm-avatar">{(user.name||'U')[0].toUpperCase()}</div>
+              <div>
+                <div className="crm-user-name">{user.name||'Mohamed Ali'}</div>
+                <div className="crm-user-email">{user.email||'admin@aurasocials.com'}</div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="crm-content">
+          <Routes>
+            <Route index          element={<CRMDashboard/>}/>
+            <Route path="clients"  element={<CRMClients/>}/>
+            <Route path="ai"       element={<CRMAIGenerator/>}/>
+            <Route path="calendar" element={<CalendarPage/>}/>
+            <Route path="analytics"element={<AnalyticsPage/>}/>
+            <Route path="insights" element={<CRMInsights/>}/>
+            <Route path="settings" element={<CRMSettings/>}/>
+            <Route path="*"        element={<Navigate to="/crm"/>}/>
+          </Routes>
+        </main>
+      </div>
+
+      <style>{`
+        @keyframes notifIn {
+          from { opacity:0; transform:scale(0.96) translateY(-8px); }
+          to   { opacity:1; transform:scale(1) translateY(0); }
+        }
+      `}</style>
+    </div>
+  )
+}
+
+// ── EXPORT AVEC PROVIDER ─────────────────────────────────────────────────────
+export default function CRMLayout() {
+  return (
+    <CRMSettingsProvider>
+      <CRMLayoutInner/>
+    </CRMSettingsProvider>
+  )
+}

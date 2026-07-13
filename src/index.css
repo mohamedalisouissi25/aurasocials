@@ -810,3 +810,141 @@ body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: anti
 .li-account-headline { font-size: 12px; color: #56687A; margin-top: 2px; }
 .li-modal-footer { border-top: 1px solid #E4E2DF; margin-top: 20px; padding-top: 16px; display: flex; justify-content: center; gap: 20px; }
 .li-footer-link { font-size: 12px; color: #0A66C2; background: none; border: none; cursor: pointer; font-family: inherit; }
+
+/* ════════════════════════════════════════════════════════════
+   CRM DARK THEME
+════════════════════════════════════════════════════════════ */
+[data-crm-theme="dark"] .crm-main          { background: #0F172A; }
+[data-crm-theme="dark"] .crm-content       { background: #0F172A; }
+[data-crm-theme="dark"] .crm-topbar        { background: #1E293B; border-color: #334155; }
+[data-crm-theme="dark"] .crm-topbar-title  { color: #F1F5F9; }
+[data-crm-theme="dark"] .crm-user-name     { color: #F1F5F9; }
+[data-crm-theme="dark"] .crm-user-email    { color: #64748B; }
+[data-crm-theme="dark"] .crm-bell-btn      { color: #64748B; }
+[data-crm-theme="dark"] .crm-bell-btn:hover { background: #1E293B; color: #F1F5F9; }
+
+/* Cards */
+[data-crm-theme="dark"] .crm-card,
+[data-crm-theme="dark"] .crm-kpi-card,
+[data-crm-theme="dark"] .analytics-net-card,
+[data-crm-theme="dark"] .insight-card     { background: #1E293B; border-color: #334155; }
+[data-crm-theme="dark"] .crm-kpi-value    { color: #F1F5F9; }
+[data-crm-theme="dark"] .crm-kpi-label    { color: #64748B; }
+[data-crm-theme="dark"] .crm-card-title   { color: #F1F5F9; }
+
+/* Welcome banner - keep gradient */
+[data-crm-theme="dark"] .crm-welcome { background: linear-gradient(135deg,#1E293B,#4A6CF7); }
+
+/* Text */
+[data-crm-theme="dark"] h1,
+[data-crm-theme="dark"] h2,
+[data-crm-theme="dark"] h3              { color: #F1F5F9; }
+[data-crm-theme="dark"] .crm-client-name { color: #F1F5F9; }
+[data-crm-theme="dark"] .crm-client-sector { color: #64748B; }
+[data-crm-theme="dark"] .crm-suggestion  { background: #0F172A; border-color: #334155; }
+[data-crm-theme="dark"] .crm-suggestion:hover { background: #162032; border-color: #4A6CF7; }
+[data-crm-theme="dark"] .crm-suggestion-text { color: #CBD5E1; }
+[data-crm-theme="dark"] .crm-scheduled-text  { color: #CBD5E1; }
+[data-crm-theme="dark"] .crm-scheduled-time  { color: #64748B; }
+[data-crm-theme="dark"] .crm-scheduled-row   { border-color: #1E293B; }
+
+/* Table */
+[data-crm-theme="dark"] .crm-card[style*="padding:0"] { background: #1E293B; border-color: #334155; }
+[data-crm-theme="dark"] .crm-table th    { background: #0F172A; color: #64748B; }
+[data-crm-theme="dark"] .crm-table td    { color: #CBD5E1; }
+[data-crm-theme="dark"] .crm-table tr:hover td { background: #162032; }
+[data-crm-theme="dark"] .crm-table       { background: #1E293B; }
+[data-crm-theme="dark"] .crm-toolbar     { background: #1E293B; border-color: #334155; }
+[data-crm-theme="dark"] .crm-search      { background: #0F172A; border-color: #334155; color: #F1F5F9; }
+[data-crm-theme="dark"] .crm-search::placeholder { color: #475569; }
+[data-crm-theme="dark"] .crm-filter-btn  { background: #0F172A; border-color: #334155; color: #64748B; }
+[data-crm-theme="dark"] .crm-filter-btn.active { background: #4A6CF7; color: white; border-color: #4A6CF7; }
+
+/* Calendar */
+[data-crm-theme="dark"] .cal-cell        { background: #1E293B; border-color: #334155; }
+[data-crm-theme="dark"] .cal-cell:hover  { border-color: #4A6CF7; background: #162032; }
+[data-crm-theme="dark"] .cal-cell-num    { color: #CBD5E1; }
+[data-crm-theme="dark"] .cal-day-name    { color: #475569; }
+
+/* Analytics bars */
+[data-crm-theme="dark"] .analytics-bar-bg  { background: #334155; }
+[data-crm-theme="dark"] .analytics-bar-label { color: #94A3B8; }
+[data-crm-theme="dark"] .analytics-bar-val   { color: #CBD5E1; }
+
+/* Settings panel */
+[data-crm-theme="dark"] .settings-panel  { background: #1E293B; border-color: #334155; }
+[data-crm-theme="dark"] .settings-panel-title { color: #F1F5F9; }
+[data-crm-theme="dark"] .settings-panel-sub   { color: #64748B; }
+[data-crm-theme="dark"] .settings-label  { color: #CBD5E1; }
+[data-crm-theme="dark"] .settings-input,
+[data-crm-theme="dark"] .settings-select,
+[data-crm-theme="dark"] .settings-textarea { background: #0F172A; border-color: #334155; color: #F1F5F9; }
+[data-crm-theme="dark"] .settings-section-divider { border-color: #334155; }
+[data-crm-theme="dark"] .settings-avatar-info { color: #64748B; }
+[data-crm-theme="dark"] .settings-avatar-btn { background: #0F172A; border-color: #334155; color: #CBD5E1; }
+[data-crm-theme="dark"] .toggle-row      { border-color: #1E293B; }
+[data-crm-theme="dark"] .toggle-label    { color: #F1F5F9; }
+[data-crm-theme="dark"] .toggle-desc     { color: #64748B; }
+[data-crm-theme="dark"] .integration-row { border-color: #334155; background: #0F172A; }
+[data-crm-theme="dark"] .integration-name { color: #F1F5F9; }
+[data-crm-theme="dark"] .api-key-box     { background: #0F172A; border-color: #334155; color: #CBD5E1; }
+[data-crm-theme="dark"] .member-name     { color: #F1F5F9; }
+[data-crm-theme="dark"] .member-email    { color: #64748B; }
+
+/* AI Generator */
+[data-crm-theme="dark"] .crm-template-btn { background: #0F172A; border-color: #334155; color: #CBD5E1; }
+[data-crm-theme="dark"] .crm-template-btn:hover { border-color: #4A6CF7; color: #4A6CF7; background: #162032; }
+[data-crm-theme="dark"] .crm-template-btn.selected { background: #162032; }
+[data-crm-theme="dark"] .crm-select,
+[data-crm-theme="dark"] .crm-textarea    { background: #0F172A; border-color: #334155; color: #F1F5F9; }
+[data-crm-theme="dark"] .crm-result-box  { background: #0F172A; border-color: #334155; }
+[data-crm-theme="dark"] .crm-result-text { color: #CBD5E1; }
+[data-crm-theme="dark"] .crm-result-empty h3 { color: #F1F5F9; }
+[data-crm-theme="dark"] .crm-ai-icon-box { background: #162032; }
+
+/* Insights */
+[data-crm-theme="dark"] .insight-title   { color: #F1F5F9; }
+[data-crm-theme="dark"] .insight-sub     { color: #64748B; }
+[data-crm-theme="dark"] .score-bar-bg    { background: #334155; }
+[data-crm-theme="dark"] .score-bar-label { color: #94A3B8; }
+[data-crm-theme="dark"] .score-bar-val   { color: #CBD5E1; }
+[data-crm-theme="dark"] .recycle-row     { background: #0F172A; border-color: #334155; }
+[data-crm-theme="dark"] .recycle-text    { color: #CBD5E1; }
+[data-crm-theme="dark"] .crisis-text     { color: #CBD5E1; }
+[data-crm-theme="dark"] .competitor-name { color: #F1F5F9; }
+[data-crm-theme="dark"] .competitor-stat { color: #64748B; }
+
+/* RTL support for Arabic */
+[data-crm-dir="rtl"] .crm-wrap   { direction: rtl; }
+[data-crm-dir="rtl"] .crm-nav-item { flex-direction: row-reverse; }
+[data-crm-dir="rtl"] .crm-topbar { flex-direction: row-reverse; }
+
+/* ════════════════════════════════════════════════════════════
+   CRM DENSITY
+════════════════════════════════════════════════════════════ */
+/* Compact */
+[data-crm-density="compact"] .crm-content   { padding: 16px; }
+[data-crm-density="compact"] .crm-card      { padding: 16px; }
+[data-crm-density="compact"] .crm-kpi-card  { padding: 14px; }
+[data-crm-density="compact"] .crm-kpi-grid  { gap: 10px; }
+[data-crm-density="compact"] .crm-kpi-value { font-size: 22px; }
+[data-crm-density="compact"] .crm-table th  { padding: 8px 12px; }
+[data-crm-density="compact"] .crm-table td  { padding: 8px 12px; }
+[data-crm-density="compact"] .crm-nav-item  { padding: 8px 10px; }
+[data-crm-density="compact"] .crm-topbar    { height: 48px; }
+[data-crm-density="compact"] .crm-suggestion { padding: 8px 10px; margin-bottom: 6px; }
+[data-crm-density="compact"] .cal-cell      { min-height: 60px; }
+
+/* Comfortable (default - no override needed) */
+
+/* Spacious */
+[data-crm-density="spacious"] .crm-content  { padding: 40px; }
+[data-crm-density="spacious"] .crm-card     { padding: 32px; }
+[data-crm-density="spacious"] .crm-kpi-card { padding: 28px; }
+[data-crm-density="spacious"] .crm-kpi-grid { gap: 24px; }
+[data-crm-density="spacious"] .crm-kpi-value { font-size: 32px; }
+[data-crm-density="spacious"] .crm-table th { padding: 16px 20px; }
+[data-crm-density="spacious"] .crm-table td { padding: 18px 20px; }
+[data-crm-density="spacious"] .crm-nav-item { padding: 13px 14px; font-size: 14px; }
+[data-crm-density="spacious"] .crm-topbar   { height: 72px; }
+[data-crm-density="spacious"] .cal-cell     { min-height: 110px; }
