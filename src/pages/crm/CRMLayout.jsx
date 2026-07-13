@@ -3,7 +3,7 @@ import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-
 import {
   LayoutDashboard, Users, Calendar, Brain, BarChart3,
   Settings, LogOut, ChevronLeft, ChevronRight, Sparkles,
-  Bell, X, CheckCheck, AlertTriangle, TrendingUp, Info,
+  Bell, X, CheckCheck, AlertTriangle, TrendingUp,
   ArrowLeft, ExternalLink
 } from 'lucide-react'
 import CRMDashboard   from './CRMDashboard'
@@ -12,7 +12,9 @@ import CRMAIGenerator from './CRMAIGenerator'
 import CRMSettings    from './CRMSettings'
 import CRMInsights    from './CRMInsights'
 
-const NAV = [
+const NET_C = { IG:'#E97729', LI:'#0A66C2', FB:'#1877F2', TK:'#111' }
+
+const NAV_ITEMS = [
   { path:'/crm',           label:'Dashboard',    icon:LayoutDashboard },
   { path:'/crm/clients',   label:'Clients',      icon:Users },
   { path:'/crm/calendar',  label:'Publications', icon:Calendar },
@@ -20,8 +22,6 @@ const NAV = [
   { path:'/crm/analytics', label:'Analytics',    icon:BarChart3 },
   { path:'/crm/insights',  label:'Insights IA',  icon:Sparkles },
 ]
-
-const NET_C = { IG:'#E97729', LI:'#0A66C2', FB:'#1877F2', TK:'#111' }
 
 const INIT_NOTIFICATIONS = [
   {
@@ -35,8 +35,8 @@ const INIT_NOTIFICATIONS = [
   {
     id:2, type:'success', IconComp:TrendingUp, color:'#059669', bg:'#D1FAE5',
     title:'Performance en hausse',
-    desc:'Café Lumière Instagram — Engagement +28% cette semaine',
-    detail:'Le compte Instagram de Café Lumière enregistre une semaine exceptionnelle : +28% d\'engagement, +342 nouveaux abonnés. Le post "Terrasse été 2026" a atteint 12 400 personnes organiquement — meilleur résultat depuis le lancement du compte.',
+    desc:"Café Lumière Instagram — Engagement +28% cette semaine",
+    detail:"Le compte Instagram de Café Lumière enregistre une semaine exceptionnelle : +28% d'engagement, +342 nouveaux abonnés. Le post \"Terrasse été 2026\" a atteint 12 400 personnes organiquement — meilleur résultat depuis le lancement du compte.",
     action:'Voir les analytics', actionPath:'/crm/analytics',
     time:'Il y a 1h', read:false,
   },
@@ -44,7 +44,7 @@ const INIT_NOTIFICATIONS = [
     id:3, type:'info', IconComp:Brain, color:'#4A6CF7', bg:'#EEF1FB',
     title:'Rapport IA prêt',
     desc:'Plan éditorial juillet 2026 généré pour Voyage & Liberté',
-    detail:'Le plan éditorial complet pour juillet 2026 a été généré pour Voyage & Liberté. Il comprend 28 publications réparties sur Instagram (12), TikTok (8), Facebook (8), avec les horaires optimaux, les hashtags recommandés et les formats suggérés pour chaque post.',
+    detail:"Le plan éditorial complet pour juillet 2026 a été généré pour Voyage & Liberté. Il comprend 28 publications réparties sur Instagram (12), TikTok (8), Facebook (8), avec les horaires optimaux, les hashtags recommandés et les formats suggérés pour chaque post.",
     action:'Voir le générateur IA', actionPath:'/crm/ai',
     time:'Il y a 2h', read:false,
   },
@@ -60,7 +60,7 @@ const INIT_NOTIFICATIONS = [
     id:5, type:'success', IconComp:CheckCheck, color:'#059669', bg:'#D1FAE5',
     title:'Publication publiée avec succès',
     desc:'Post Instagram Nike France publié à 18h00',
-    detail:'La publication Instagram programmée pour Nike France a été publiée avec succès à 18h00. Résultats après 30 minutes : 234 likes, 18 commentaires, 56 partages. Taux d\'engagement initial : 4.2% — au-dessus de la moyenne du compte (3.8%).',
+    detail:"La publication Instagram programmée pour Nike France a été publiée avec succès à 18h00. Résultats après 30 minutes : 234 likes, 18 commentaires, 56 partages. Taux d'engagement initial : 4.2% — au-dessus de la moyenne du compte (3.8%).",
     action:'Voir le calendrier', actionPath:'/crm/calendar',
     time:'Hier 18:02', read:true,
   },
@@ -70,15 +70,11 @@ const INIT_NOTIFICATIONS = [
 function NotificationPanel({ notifs, setNotifs, onClose, onNavigate }) {
   const [selected, setSelected] = useState(null)
 
-  const unread   = notifs.filter(n => !n.read).length
-  const markAll  = () => setNotifs(n => n.map(x => ({ ...x, read:true })))
-  const markOne  = (id) => setNotifs(n => n.map(x => x.id===id ? {...x,read:true} : x))
-  const removeOne= (id) => { setNotifs(n => n.filter(x => x.id!==id)); if(selected?.id===id) setSelected(null) }
-
-  const handleClick = (notif) => {
-    markOne(notif.id)
-    setSelected(notif)
-  }
+  const unread    = notifs.filter(n => !n.read).length
+  const markAll   = () => setNotifs(n => n.map(x => ({ ...x, read:true })))
+  const markOne   = (id) => setNotifs(n => n.map(x => x.id===id ? {...x,read:true} : x))
+  const removeOne = (id) => { setNotifs(n => n.filter(x => x.id!==id)); if(selected?.id===id) setSelected(null) }
+  const handleClick = (notif) => { markOne(notif.id); setSelected(notif) }
 
   const DetailView = ({ notif }) => {
     const Icon = notif.IconComp
@@ -101,13 +97,11 @@ function NotificationPanel({ notifs, setNotifs, onClose, onNavigate }) {
           <div style={{fontSize:14,color:'#374151',lineHeight:1.75,marginBottom:20,padding:'14px',background:'#F8FAFF',borderRadius:12,border:'1px solid #E8ECF8'}}>
             {notif.detail}
           </div>
-          <button
-            onClick={() => { onNavigate(notif.actionPath); onClose() }}
+          <button onClick={() => { onNavigate(notif.actionPath); onClose() }}
             style={{width:'100%',background:'#4A6CF7',color:'white',border:'none',padding:'12px',borderRadius:11,fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:'inherit',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:'0 4px 12px rgba(74,108,247,0.3)'}}>
             <ExternalLink size={15}/> {notif.action}
           </button>
-          <button
-            onClick={() => { removeOne(notif.id); setSelected(null) }}
+          <button onClick={() => { removeOne(notif.id); setSelected(null) }}
             style={{width:'100%',background:'none',border:'1.5px solid #FEE2E2',color:'#EF4444',padding:'10px',borderRadius:10,fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit',marginTop:8}}>
             Supprimer cette notification
           </button>
@@ -124,20 +118,17 @@ function NotificationPanel({ notifs, setNotifs, onClose, onNavigate }) {
       zIndex:200, display:'flex', flexDirection:'column',
       animation:'notifIn 0.2s ease', overflow:'hidden',
     }}>
-      {selected ? (
-        <DetailView notif={selected}/>
-      ) : (
+      {selected ? <DetailView notif={selected}/> : (
         <>
-          {/* Header */}
           <div style={{padding:'16px 20px',borderBottom:'1px solid #F3F4F6',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
             <div>
               <div style={{fontSize:15,fontWeight:800,color:'#111827'}}>Notifications</div>
-              <div style={{fontSize:12,marginTop:2,color: unread>0 ? '#9CA3AF' : '#059669'}}>
-                {unread > 0 ? `${unread} non lue${unread>1?'s':''}` : '✓ Tout est lu'}
+              <div style={{fontSize:12,marginTop:2,color:unread>0?'#9CA3AF':'#059669'}}>
+                {unread>0 ? `${unread} non lue${unread>1?'s':''}` : '✓ Tout est lu'}
               </div>
             </div>
             <div style={{display:'flex',gap:8,alignItems:'center'}}>
-              {unread > 0 && (
+              {unread>0 && (
                 <button onClick={markAll}
                   style={{fontSize:11,fontWeight:700,color:'#4A6CF7',background:'#EEF1FB',border:'none',padding:'5px 11px',borderRadius:8,cursor:'pointer',fontFamily:'inherit'}}>
                   Tout lire
@@ -150,27 +141,18 @@ function NotificationPanel({ notifs, setNotifs, onClose, onNavigate }) {
             </div>
           </div>
 
-          {/* List */}
           <div style={{overflowY:'auto',flex:1}}>
-            {notifs.length === 0 ? (
+            {notifs.length===0 ? (
               <div style={{padding:'52px 20px',textAlign:'center'}}>
                 <div style={{fontSize:48,marginBottom:14}}>🔔</div>
                 <div style={{fontSize:15,fontWeight:700,color:'#111827',marginBottom:6}}>Aucune notification</div>
                 <div style={{fontSize:13,color:'#9CA3AF'}}>Vous êtes à jour ! Les alertes apparaîtront ici.</div>
               </div>
-            ) : notifs.map((n) => {
+            ) : notifs.map(n => {
               const Icon = n.IconComp
               return (
-                <div key={n.id}
-                  onClick={() => handleClick(n)}
-                  style={{
-                    display:'flex',alignItems:'flex-start',gap:12,
-                    padding:'14px 20px',cursor:'pointer',
-                    background: n.read ? 'white' : '#FAFBFF',
-                    borderBottom:'1px solid #F9FAFB',
-                    transition:'background 0.15s',
-                    position:'relative',
-                  }}
+                <div key={n.id} onClick={() => handleClick(n)}
+                  style={{display:'flex',alignItems:'flex-start',gap:12,padding:'14px 20px',cursor:'pointer',background:n.read?'white':'#FAFBFF',borderBottom:'1px solid #F9FAFB',transition:'background 0.15s',position:'relative'}}
                   onMouseEnter={e => e.currentTarget.style.background='#F8FAFF'}
                   onMouseLeave={e => e.currentTarget.style.background=n.read?'white':'#FAFBFF'}>
                   {!n.read && (
@@ -180,16 +162,12 @@ function NotificationPanel({ notifs, setNotifs, onClose, onNavigate }) {
                     <Icon size={16} style={{color:n.color}}/>
                   </div>
                   <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontSize:13,fontWeight:n.read?500:700,color:'#111827',marginBottom:2,lineHeight:1.4}}>
-                      {n.title}
-                    </div>
+                    <div style={{fontSize:13,fontWeight:n.read?500:700,color:'#111827',marginBottom:2,lineHeight:1.4}}>{n.title}</div>
                     <div style={{fontSize:12,color:'#6B7280',lineHeight:1.5,marginBottom:3}}>{n.desc}</div>
                     <div style={{fontSize:11,color:'#9CA3AF'}}>{n.time}</div>
                   </div>
-                  <button
-                    onClick={e => { e.stopPropagation(); removeOne(n.id) }}
-                    style={{background:'none',border:'none',cursor:'pointer',color:'#D1D5DB',padding:4,display:'flex',alignItems:'center',flexShrink:0,marginTop:1}}
-                    title="Supprimer">
+                  <button onClick={e => { e.stopPropagation(); removeOne(n.id) }}
+                    style={{background:'none',border:'none',cursor:'pointer',color:'#D1D5DB',padding:4,display:'flex',alignItems:'center',flexShrink:0,marginTop:1}}>
                     <X size={13}/>
                   </button>
                 </div>
@@ -197,10 +175,8 @@ function NotificationPanel({ notifs, setNotifs, onClose, onNavigate }) {
             })}
           </div>
 
-          {/* Footer */}
           <div style={{padding:'12px 20px',borderTop:'1px solid #F3F4F6',textAlign:'center',flexShrink:0}}>
-            <button
-              onClick={() => { onNavigate('/crm/settings'); onClose() }}
+            <button onClick={() => { onNavigate('/crm/settings'); onClose() }}
               style={{fontSize:13,fontWeight:600,color:'#4A6CF7',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
               Gérer les notifications →
             </button>
@@ -211,7 +187,7 @@ function NotificationPanel({ notifs, setNotifs, onClose, onNavigate }) {
   )
 }
 
-// ── PAGES INLINE ─────────────────────────────────────────────────────────────
+// ── CALENDAR PAGE ────────────────────────────────────────────────────────────
 function CalendarPage() {
   const posts = {1:['IG','LI'],3:['FB'],5:['IG'],8:['LI','IG'],10:['TK'],12:['IG'],14:['FB','LI'],15:['IG'],17:['IG'],19:['LI'],21:['IG','FB'],22:['TK'],25:['IG'],27:['LI'],29:['FB','TK']}
   return (
@@ -240,6 +216,7 @@ function CalendarPage() {
   )
 }
 
+// ── ANALYTICS PAGE ───────────────────────────────────────────────────────────
 function AnalyticsPage() {
   const networks = [
     {name:'Instagram',color:'#E97729',followers:'12.4K',reach:'45.2K',engagement:'4.8%',posts:32,bars:[{l:'Reach',v:78},{l:'Engagement',v:85},{l:'Followers',v:62}]},
@@ -295,16 +272,15 @@ function AnalyticsPage() {
 }
 
 // ── MAIN LAYOUT ──────────────────────────────────────────────────────────────
-export default function CRMLayout() {
+function CRMLayoutInner() {
   const nav  = useNavigate()
   const loc  = useLocation()
   const [collapsed,  setCollapsed]  = useState(false)
   const [showNotifs, setShowNotifs] = useState(false)
-  const [notifs,     setNotifs]     = useState(INIT_NOTIFICATIONS) // ← state levé ici
+  const [notifs,     setNotifs]     = useState(INIT_NOTIFICATIONS)
   const bellRef = useRef(null)
   const user = JSON.parse(localStorage.getItem('aura_user') || '{}')
 
-  // Badge count calculé depuis le state → se met à jour en temps réel
   const unreadCount = notifs.filter(n => !n.read).length
 
   useEffect(() => {
@@ -317,7 +293,10 @@ export default function CRMLayout() {
 
   const logout = () => { localStorage.removeItem('aura_user'); nav('/login') }
 
-  const allPaths = [...NAV, { path:'/crm/settings', label:'Paramètres', icon:Settings }]
+  const allPaths = [
+    ...NAV_ITEMS,
+    { path:'/crm/settings', label:'Paramètres', icon:Settings },
+  ]
   const currentPage = allPaths.find(n =>
     n.path === loc.pathname || (n.path !== '/crm' && loc.pathname.startsWith(n.path))
   )
@@ -336,8 +315,9 @@ export default function CRMLayout() {
         <button className="crm-collapse-btn" onClick={() => setCollapsed(!collapsed)}>
           {collapsed ? <ChevronRight size={13}/> : <ChevronLeft size={13}/>}
         </button>
+
         <nav className="crm-nav">
-          {NAV.map(({ path, label, icon:Icon }) => (
+          {NAV_ITEMS.map(({ path, label, icon:Icon }) => (
             <button key={path} onClick={() => nav(path)}
               className={`crm-nav-item ${isActive(path)?'active':''}`}>
               <Icon size={18} style={{flexShrink:0}}/>
@@ -348,6 +328,7 @@ export default function CRMLayout() {
             </button>
           ))}
         </nav>
+
         <div className="crm-nav-bottom">
           <button onClick={() => nav('/crm/settings')}
             className={`crm-nav-item ${isActive('/crm/settings')?'active':''}`}
@@ -355,7 +336,9 @@ export default function CRMLayout() {
             <Settings size={17} style={{flexShrink:0}}/>
             {!collapsed && <span>Paramètres</span>}
           </button>
-          <button onClick={logout} className="crm-nav-item crm-nav-item-danger" style={{width:'100%'}}>
+          <button onClick={logout}
+            className="crm-nav-item crm-nav-item-danger"
+            style={{width:'100%'}}>
             <LogOut size={17} style={{flexShrink:0}}/>
             {!collapsed && <span>Déconnexion</span>}
           </button>
@@ -370,10 +353,10 @@ export default function CRMLayout() {
 
             {/* Bell */}
             <div ref={bellRef} style={{position:'relative'}}>
-              <button
-                onClick={() => setShowNotifs(!showNotifs)}
+              <button onClick={() => setShowNotifs(!showNotifs)}
                 style={{
-                  position:'relative', background: showNotifs?'#EEF1FB':'none',
+                  position:'relative',
+                  background: showNotifs?'#EEF1FB':'none',
                   border:'none', cursor:'pointer',
                   color: showNotifs?'#4A6CF7':'#9CA3AF',
                   padding:8, borderRadius:10,
@@ -381,7 +364,7 @@ export default function CRMLayout() {
                   transition:'all 0.15s',
                 }}>
                 <Bell size={18}/>
-                {unreadCount > 0 && (
+                {unreadCount>0 && (
                   <span style={{
                     position:'absolute', top:4, right:4,
                     minWidth:16, height:16, background:'#EF4444',
@@ -405,11 +388,10 @@ export default function CRMLayout() {
             </div>
 
             {/* User */}
-            <div
-              onClick={() => nav('/crm/settings')}
+            <div onClick={() => nav('/crm/settings')}
               style={{display:'flex',alignItems:'center',gap:10,cursor:'pointer',padding:'6px 10px',borderRadius:10,transition:'background 0.15s'}}
-              onMouseEnter={e=>e.currentTarget.style.background='#F8FAFF'}
-              onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+              onMouseEnter={e => e.currentTarget.style.background='#F8FAFF'}
+              onMouseLeave={e => e.currentTarget.style.background='transparent'}>
               <div className="crm-avatar">{(user.name||'U')[0].toUpperCase()}</div>
               <div>
                 <div className="crm-user-name">{user.name||'Mohamed Ali'}</div>
@@ -441,4 +423,8 @@ export default function CRMLayout() {
       `}</style>
     </div>
   )
+}
+
+export default function CRMLayout() {
+  return <CRMLayoutInner/>
 }
